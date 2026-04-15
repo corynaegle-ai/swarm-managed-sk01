@@ -1,265 +1,294 @@
 /**
- * PlayerSetupManager handles all player setup UI interactions, form validation,
- * and player list management
+ * Player Setup Module
+ * Handles player form validation, adding/removing players, and game start logic
  */
-class PlayerSetupManager {
-  /**
-   * Initialize the PlayerSetupManager
-   */
-  constructor() {
-    this.players = [];
-    this.playerNameInput = null;
-    this.addPlayerBtn = null;
-    this.playerListContainer = null;
-    this.startGameBtn = null;
-    this.playerForm = null;
 
-    this.init();
-  }
-
-  /**
-   * Initialize the setup manager and attach event listeners
-   */
-  init() {
-    // Get DOM elements
-    this.playerForm = document.getElementById('playerForm');
-    this.playerNameInput = document.getElementById('playerName');
-    this.addPlayerBtn = document.getElementById('addPlayerBtn');
-    this.playerListContainer = document.getElementById('playerList');
-    this.startGameBtn = document.getElementById('startGameBtn');
-
-    // Verify all required elements exist
-    if (!this.playerForm || !this.playerNameInput || !this.addPlayerBtn ||
-        !this.playerListContainer || !this.startGameBtn) {
-      console.error('One or more required DOM elements not found');
-      return;
+(function() {
+    'use strict';
+    
+    // Configuration
+    const CONFIG = {
+        MIN_PLAYERS: 2,
+        MAX_PLAYERS: 8,
+        MIN_NAME_LENGTH: 1,
+        MAX_NAME_LENGTH: 50
+    };
+    
+    // State
+    const state = {
+        players: []
+    };
+    
+    // DOM Elements
+    const elements = {
+        playerNameInput: null,
+        addPlayerBtn: null,
+        playersList: null,
+        playerCount: null,
+        startGameBtn: null,
+        resetBtn: null,
+        inputError: null,
+        playerForm: null
+    };
+    
+    /**
+     * Initialize the module
+     */
+    function init() {
+        cacheElements();
+        attachEventListeners();
+        updateUI();
     }
-
-    // Attach event listeners
-    this.playerForm.addEventListener('submit', (e) => this.handleAddPlayer(e));
-    this.startGameBtn.addEventListener('click', () => this.handleStartGame());
-
-    // Initial button state
-    this.updateStartGameButtonState();
-  }
-
-  /**
-   * Handle the add player form submission
-   * @param {Event} event - The form submission event
-   */
-  handleAddPlayer(event) {
-    event.preventDefault();
-
-    const playerName = this.playerNameInput.value.trim();
-
-    // Validate player name
-    if (!this.validatePlayerName(playerName)) {
-      return;
+    
+    /**
+     * Cache DOM elements for better performance
+     */
+    function cacheElements() {
+        elements.playerNameInput = document.getElementById('playerNameInput');
+        elements.addPlayerBtn = document.getElementById('addPlayerBtn');
+        elements.playersList = document.getElementById('playersList');
+        elements.playerCount = document.getElementById('playerCount');
+        elements.startGameBtn = document.getElementById('startGameBtn');
+        elements.resetBtn = document.getElementById('resetBtn');
+        elements.inputError = document.getElementById('inputError');
+        elements.playerForm = document.getElementById('playerForm');
+        
+        if (!elements.playerNameInput || !elements.addPlayerBtn) {
+            console.error('Critical DOM elements not found');
+        }
     }
-
-    // Check for duplicate names
-    if (this.isDuplicateName(playerName)) {
-      this.showError('Player name already exists');
-      return;
+    
+    /**
+     * Attach event listeners
+     */
+    function attachEventListeners() {
+        elements.addPlayerBtn.addEventListener('click', handleAddPlayer);
+        elements.startGameBtn.addEventListener('click', handleStartGame);
+        elements.resetBtn.addEventListener('click', handleReset);
+        elements.playerNameInput.addEventListener('keypress', handleInputKeypress);
+        elements.playerNameInput.addEventListener('input', clearInputError);
     }
-
-    // Create new player and add to list
-    const player = new Player(playerName);
-    this.players.push(player);
-
-    // Update UI
-    this.renderPlayerList();
-    this.playerNameInput.value = '';
-    this.playerNameInput.focus();
-    this.updateStartGameButtonState();
-  }
-
-  /**
-   * Validate player name input
-   * @param {string} name - The player name to validate
-   * @returns {boolean} True if valid, false otherwise
-   */
-  validatePlayerName(name) {
-    if (!name || name.length === 0) {
-      this.showError('Please enter a player name');
-      return false;
+    
+    /**
+     * Handle adding a player on button click
+     */
+    function handleAddPlayer(event) {
+        event.preventDefault();
+        addPlayer();
     }
-
-    if (name.length < 2) {
-      this.showError('Player name must be at least 2 characters long');
-      return false;
+    
+    /**
+     * Handle Enter key in input field
+     */
+    function handleInputKeypress(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addPlayer();
+        }
     }
-
-    if (name.length > 50) {
-      this.showError('Player name must not exceed 50 characters');
-      return false;
+    
+    /**
+     * Clear input error message
+     */
+    function clearInputError() {
+        elements.inputError.textContent = '';
     }
-
-    // Check for invalid characters (allow alphanumeric, spaces, and some special chars)
-    const validNameRegex = /^[a-zA-Z0-9\s\-']+$/;
-    if (!validNameRegex.test(name)) {
-      this.showError('Player name contains invalid characters');
-      return false;
+    
+    /**
+     * Validate player name
+     */
+    function validatePlayerName(name) {
+        const trimmedName = name.trim();
+        
+        // Check empty
+        if (trimmedName.length === 0) {
+            return { valid: false, error: 'Player name cannot be empty' };
+        }
+        
+        // Check length
+        if (trimmedName.length < CONFIG.MIN_NAME_LENGTH) {
+            return { valid: false, error: 'Player name is too short' };
+        }
+        
+        if (trimmedName.length > CONFIG.MAX_NAME_LENGTH) {
+            return { valid: false, error: `Player name cannot exceed ${CONFIG.MAX_NAME_LENGTH} characters` };
+        }
+        
+        // Check for duplicates (case-insensitive)
+        const isDuplicate = state.players.some(p => 
+            p.name.toLowerCase() === trimmedName.toLowerCase()
+        );
+        
+        if (isDuplicate) {
+            return { valid: false, error: 'A player with this name already exists' };
+        }
+        
+        // Check player limit
+        if (state.players.length >= CONFIG.MAX_PLAYERS) {
+            return { valid: false, error: `Maximum of ${CONFIG.MAX_PLAYERS} players reached` };
+        }
+        
+        return { valid: true, error: '' };
     }
-
-    return true;
-  }
-
-  /**
-   * Check if a player name already exists
-   * @param {string} name - The player name to check
-   * @returns {boolean} True if name exists, false otherwise
-   */
-  isDuplicateName(name) {
-    return this.players.some(player => player.name.toLowerCase() === name.toLowerCase());
-  }
-
-  /**
-   * Show an error message to the user
-   * @param {string} message - The error message to display
-   */
-  showError(message) {
-    // Create error element if it doesn't exist
-    let errorElement = document.getElementById('playerFormError');
-    if (!errorElement) {
-      errorElement = document.createElement('div');
-      errorElement.id = 'playerFormError';
-      errorElement.className = 'error-message';
-      this.playerForm.insertBefore(errorElement, this.playerForm.firstChild);
+    
+    /**
+     * Add a player to the list
+     */
+    function addPlayer() {
+        const input = elements.playerNameInput.value;
+        const validation = validatePlayerName(input);
+        
+        if (!validation.valid) {
+            elements.inputError.textContent = validation.error;
+            elements.playerNameInput.focus();
+            return;
+        }
+        
+        state.players.push({
+            id: Date.now(),
+            name: input.trim()
+        });
+        
+        elements.playerNameInput.value = '';
+        clearInputError();
+        updateUI();
+        elements.playerNameInput.focus();
     }
-
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-
-    // Clear error after 3 seconds
-    setTimeout(() => {
-      errorElement.style.display = 'none';
-    }, 3000);
-  }
-
-  /**
-   * Remove a player from the list
-   * @param {string} playerId - The ID of the player to remove
-   */
-  removePlayer(playerId) {
-    this.players = this.players.filter(player => player.id !== playerId);
-    this.renderPlayerList();
-    this.updateStartGameButtonState();
-  }
-
-  /**
-   * Render the player list in the UI
-   */
-  renderPlayerList() {
-    // Clear the container
-    this.playerListContainer.innerHTML = '';
-
-    if (this.players.length === 0) {
-      this.playerListContainer.innerHTML = '<p class="empty-message">No players added yet</p>';
-      return;
+    
+    /**
+     * Remove a player from the list
+     */
+    function removePlayer(playerId) {
+        state.players = state.players.filter(p => p.id !== playerId);
+        updateUI();
     }
-
-    // Create list items for each player
-    const ul = document.createElement('ul');
-    ul.className = 'player-list';
-
-    this.players.forEach((player, index) => {
-      const li = document.createElement('li');
-      li.className = 'player-item';
-      li.dataset.playerId = player.id;
-
-      const playerInfo = document.createElement('div');
-      playerInfo.className = 'player-info';
-      playerInfo.innerHTML = `
-        <span class="player-number">${index + 1}.</span>
-        <span class="player-name">${this.escapeHtml(player.name)}</span>
-        <span class="player-id">(ID: ${player.id})</span>
-      `;
-
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'remove-player-btn';
-      removeBtn.textContent = 'Remove';
-      removeBtn.addEventListener('click', () => this.removePlayer(player.id));
-
-      li.appendChild(playerInfo);
-      li.appendChild(removeBtn);
-      ul.appendChild(li);
-    });
-
-    this.playerListContainer.appendChild(ul);
-  }
-
-  /**
-   * Update the state of the start game button
-   */
-  updateStartGameButtonState() {
-    if (this.players.length < 2) {
-      this.startGameBtn.disabled = true;
-      this.startGameBtn.title = 'At least 2 players are required to start the game';
+    
+    /**
+     * Handle starting the game
+     */
+    function handleStartGame(event) {
+        event.preventDefault();
+        
+        if (state.players.length < CONFIG.MIN_PLAYERS) {
+            console.error('Cannot start game with less than minimum players');
+            return;
+        }
+        
+        // Dispatch custom event or call setup logic
+        const event_obj = new CustomEvent('gameStartRequested', {
+            detail: {
+                players: state.players.map(p => p.name)
+            }
+        });
+        document.dispatchEvent(event_obj);
+        
+        console.log('Game started with players:', state.players);
+    }
+    
+    /**
+     * Handle reset button
+     */
+    function handleReset(event) {
+        event.preventDefault();
+        state.players = [];
+        elements.playerNameInput.value = '';
+        clearInputError();
+        updateUI();
+        elements.playerNameInput.focus();
+    }
+    
+    /**
+     * Update UI elements based on state
+     */
+    function updateUI() {
+        updatePlayerCount();
+        updatePlayersList();
+        updateButtonStates();
+    }
+    
+    /**
+     * Update player count display
+     */
+    function updatePlayerCount() {
+        elements.playerCount.textContent = state.players.length;
+    }
+    
+    /**
+     * Update players list display
+     */
+    function updatePlayersList() {
+        elements.playersList.innerHTML = '';
+        
+        if (state.players.length === 0) {
+            const emptyMsg = document.createElement('li');
+            emptyMsg.className = 'empty-state';
+            emptyMsg.textContent = 'No players added yet';
+            elements.playersList.appendChild(emptyMsg);
+            return;
+        }
+        
+        state.players.forEach((player, index) => {
+            const li = document.createElement('li');
+            li.className = 'player-item';
+            
+            const playerInfo = document.createElement('div');
+            playerInfo.className = 'player-item-info';
+            
+            const playerNumber = document.createElement('div');
+            playerNumber.className = 'player-item-number';
+            playerNumber.textContent = index + 1;
+            
+            const playerName = document.createElement('span');
+            playerName.className = 'player-item-name';
+            playerName.textContent = player.name;
+            
+            playerInfo.appendChild(playerNumber);
+            playerInfo.appendChild(playerName);
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn-remove';
+            removeBtn.textContent = 'Remove';
+            removeBtn.addEventListener('click', () => removePlayer(player.id));
+            
+            li.appendChild(playerInfo);
+            li.appendChild(removeBtn);
+            elements.playersList.appendChild(li);
+        });
+    }
+    
+    /**
+     * Update button states based on current state
+     */
+    function updateButtonStates() {
+        // Add button disabled when max players reached
+        const isAtMaxPlayers = state.players.length >= CONFIG.MAX_PLAYERS;
+        elements.addPlayerBtn.disabled = isAtMaxPlayers;
+        
+        // Input disabled when max players reached
+        elements.playerNameInput.disabled = isAtMaxPlayers;
+        
+        // Start button disabled when less than min players
+        const hasMinPlayers = state.players.length >= CONFIG.MIN_PLAYERS;
+        elements.startGameBtn.disabled = !hasMinPlayers;
+    }
+    
+    /**
+     * Get current players (for external access if needed)
+     */
+    function getPlayers() {
+        return state.players.map(p => p.name);
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-      this.startGameBtn.disabled = false;
-      this.startGameBtn.title = '';
+        init();
     }
-  }
-
-  /**
-   * Handle the start game button click
-   */
-  handleStartGame() {
-    // Validate that we have players
-    if (this.players.length < 2) {
-      this.showError('At least 2 players are required to start the game');
-      return;
-    }
-
-    // Store players data in sessionStorage for persistence
-    try {
-      const playersData = this.players.map(player => player.getData());
-      sessionStorage.setItem('gamePlayers', JSON.stringify(playersData));
-    } catch (error) {
-      console.error('Error storing player data:', error);
-      this.showError('Error saving player data. Please try again.');
-      return;
-    }
-
-    // Navigate to the game page
-    window.location.href = 'game.html';
-  }
-
-  /**
-   * Escape HTML special characters to prevent XSS
-   * @param {string} text - The text to escape
-   * @returns {string} The escaped text
-   */
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  /**
-   * Get all players data
-   * @returns {Array} Array of player data objects
-   */
-  getPlayersData() {
-    return this.players.map(player => player.getData());
-  }
-
-  /**
-   * Get the number of players
-   * @returns {number} The number of players in the setup
-   */
-  getPlayerCount() {
-    return this.players.length;
-  }
-}
-
-// Initialize the player setup manager when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    window.playerSetupManager = new PlayerSetupManager();
-  });
-} else {
-  window.playerSetupManager = new PlayerSetupManager();
-}
+    
+    // Export for external use if needed
+    window.PlayerSetup = {
+        getPlayers: getPlayers
+    };
+})();

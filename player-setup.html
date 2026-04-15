@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Setup - Vanilla JS App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/player-setup.css">
+</head>
+<body>
+    <div id="app">
+        <div class="player-setup-container">
+            <h1>Game Setup</h1>
+            <p>Enter player names to begin the game</p>
+            
+            <div class="setup-form-section">
+                <form id="playerForm" class="player-form">
+                    <div class="form-group">
+                        <label for="playerNameInput">Player Name:</label>
+                        <input 
+                            type="text" 
+                            id="playerNameInput" 
+                            class="player-input" 
+                            placeholder="Enter player name"
+                            autocomplete="off"
+                        >
+                        <span id="inputError" class="error-message"></span>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="button" id="addPlayerBtn" class="btn btn-add">Add Player</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="player-count-section">
+                <p class="player-count">Players: <span id="playerCount">0</span>/8</p>
+            </div>
+            
+            <div class="players-list-section">
+                <h2>Players Added</h2>
+                <ul id="playersList" class="players-list">
+                    <!-- Players will be added here dynamically -->
+                </ul>
+            </div>
+            
+            <div class="action-buttons-section">
+                <button type="button" id="startGameBtn" class="btn btn-primary" disabled>
+                    Start Game
+                </button>
+                <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/player-setup.js"></script>
+</body>
+</html>
