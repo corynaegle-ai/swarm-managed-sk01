@@ -396,6 +396,58 @@ button[x-on\:click="toggleSailingMode"]:hover {
 }
 
 /* ============================================================
+   JAVASCRIPT INTERACTION CLASSES
+   ============================================================ */
+
+/* Theme toggle indicator - active when dark mode is ON */
+.pirate-theme-active {
+  background-color: var(--pirate-bg-light);
+  color: var(--pirate-text-light);
+}
+
+/* Sailing mode indicator - active when sailing mode is ON */
+.pirate-sailing-mode-active {
+  animation-play-state: running;
+}
+
+/* Focus state for keyboard navigation */
+.pirate-interactive:focus,
+button:focus {
+  outline: 2px solid var(--pirate-secondary);
+  outline-offset: 2px;
+}
+
+/* Hover effect for text links with animation */
+.pirate-link-hover:hover {
+  color: var(--pirate-hover);
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+}
+
+/* Button pressed/active state with transform */
+.pirate-button-active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px var(--pirate-shadow);
+}
+
+/* State for elements during theme transition */
+.pirate-transitioning {
+  transition: var(--pirate-transition-slow);
+}
+
+/* Disabled state for interactive elements */
+.pirate-interactive:disabled,
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button:disabled:hover {
+  background-color: var(--pirate-primary);
+  box-shadow: none;
+}
+
+/* ============================================================
    THEME TRANSITION CLASSES (For smooth theme switching)
    ============================================================ */
 
