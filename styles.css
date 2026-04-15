@@ -29,8 +29,19 @@
 }
 
 /* ============================================================
-   LIGHT MODE (Default)
+   LIGHT MODE (Default) - pirate-light-mode class
    ============================================================ */
+
+:root.pirate-light-mode {
+  --pirate-primary: #8B4513;
+  --pirate-secondary: #FFD700;
+  --pirate-accent: #DC143C;
+  --pirate-bg-light: #FFF8DC;
+  --pirate-text-light: #1a1a1a;
+  --pirate-border: #8B4513;
+  --pirate-hover: #A0522D;
+  --pirate-shadow: rgba(0, 0, 0, 0.2);
+}
 
 body,
 html {
@@ -41,6 +52,12 @@ html {
   color: var(--pirate-text-light);
   transition: var(--pirate-transition);
   line-height: 1.6;
+}
+
+:root.pirate-light-mode body,
+:root.pirate-light-mode html {
+  background-color: #FFF8DC;
+  color: #1a1a1a;
 }
 
 #app {
@@ -78,7 +95,7 @@ a:hover {
 }
 
 /* ============================================================
-   DARK MODE
+   DARK MODE - pirate-dark-mode class
    ============================================================ */
 
 :root.pirate-dark-mode {
@@ -107,7 +124,7 @@ a:hover {
 }
 
 /* ============================================================
-   SAILING MODE - Animated Effects
+   SAILING MODE - Animated Effects (pirate-sailing class)
    ============================================================ */
 
 :root.pirate-sailing h1,
@@ -139,73 +156,81 @@ a:hover {
 }
 
 /* ============================================================
-   RESPONSIVE DESIGN - Mobile, Tablet, Desktop
+   NO SAILING MODE - Disables animations (pirate-no-sailing class)
    ============================================================ */
 
-/* Mobile (< 768px) */
-@media (max-width: 767px) {
-  #app {
-    padding: 1rem;
-    font-size: 14px;
-  }
-
-  h1 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-
-  h2 {
-    font-size: 1.4rem;
-  }
-
-  p {
-    font-size: 14px;
-    line-height: 1.5;
-  }
+:root.pirate-no-sailing h1,
+:root.pirate-no-sailing h2,
+:root.pirate-no-sailing h3 {
+  animation: none;
 }
 
-/* Tablet (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-  #app {
-    padding: 1.5rem;
-    font-size: 15px;
-  }
-
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 1.2rem;
-  }
-
-  h2 {
-    font-size: 1.6rem;
-  }
-
-  p {
-    font-size: 15px;
-    line-height: 1.6;
-  }
+:root.pirate-no-sailing #app {
+  animation: none;
 }
 
-/* Desktop (>= 1024px) */
-@media (min-width: 1024px) {
-  #app {
-    padding: 2rem;
-    font-size: 16px;
-  }
+/* ============================================================
+   RESPONSIVE DESIGN CLASSES
+   ============================================================ */
 
-  h1 {
-    font-size: 2.4rem;
-    margin-bottom: 1.5rem;
-  }
+/* Mobile (< 768px) - pirate-mobile class */
+:root.pirate-mobile #app {
+  padding: 1rem;
+  font-size: 14px;
+}
 
-  h2 {
-    font-size: 1.8rem;
-  }
+:root.pirate-mobile h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
 
-  p {
-    font-size: 16px;
-    line-height: 1.8;
-  }
+:root.pirate-mobile h2 {
+  font-size: 1.4rem;
+}
+
+:root.pirate-mobile p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Tablet (768px - 1023px) - pirate-tablet class */
+:root.pirate-tablet #app {
+  padding: 1.5rem;
+  font-size: 15px;
+}
+
+:root.pirate-tablet h1 {
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
+}
+
+:root.pirate-tablet h2 {
+  font-size: 1.6rem;
+}
+
+:root.pirate-tablet p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Desktop (>= 1024px) - pirate-desktop class */
+:root.pirate-desktop #app {
+  padding: 2rem;
+  font-size: 16px;
+}
+
+:root.pirate-desktop h1 {
+  font-size: 2.4rem;
+  margin-bottom: 1.5rem;
+}
+
+:root.pirate-desktop h2 {
+  font-size: 1.8rem;
+}
+
+:root.pirate-desktop p {
+  font-size: 16px;
+  line-height: 1.8;
 }
 
 /* ============================================================
@@ -233,6 +258,7 @@ a[data-pirate-anchor]:hover::after {
   width: 100%;
 }
 
+/* Hovered anchor class added by JavaScript */
 a.pirate-anchor-hovered {
   color: var(--pirate-hover);
   font-weight: 500;
@@ -337,27 +363,6 @@ button[x-on\:click="toggleSailingMode"]:hover {
   to {
     transform: scale(1);
   }
-}
-
-/* ============================================================
-   LIGHT MODE EXPLICIT CLASS
-   ============================================================ */
-
-:root.pirate-light-mode {
-  --pirate-primary: #8B4513;
-  --pirate-secondary: #FFD700;
-  --pirate-accent: #DC143C;
-  --pirate-bg-light: #FFF8DC;
-  --pirate-text-light: #1a1a1a;
-  --pirate-border: #8B4513;
-  --pirate-hover: #A0522D;
-  --pirate-shadow: rgba(0, 0, 0, 0.2);
-}
-
-:root.pirate-light-mode body,
-:root.pirate-light-mode html {
-  background-color: #FFF8DC;
-  color: #1a1a1a;
 }
 
 /* ============================================================
