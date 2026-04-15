@@ -1,58 +1,85 @@
 /**
- * Scoring module for Skull King game
- * Implements core score calculation engine
+ * Skull King Scoring Engine
+ * Implements core scoring calculation logic for the Skull King card game
  */
 
 /**
- * Calculate the score for a round based on bid, tricks taken, and bonus points
- * @param {number} bid - The number of tricks bid (0 or higher)
+ * @typedef {Object} ScoreCalculation
+ * @property {number} totalScore - The final score after all calculations
+ * @property {number} baseScore - The base score before bonus points
+ * @property {number} bonusScore - The bonus points awarded
+ * @property {boolean} isCorrectBid - Whether the bid was correct (bid === tricks taken)
+ * @property {string} scenario - Description of the scoring scenario applied
+ */
+
+/**
+ * Calculate the score for a single hand in Skull King based on bid and tricks taken
+ *
+ * Scoring rules:
+ * - Bid 1+, correct: 20 × tricks taken
+ * - Bid 1+, incorrect: -10 × |bid - tricks taken|
+ * - Bid 0, correct: 10 × hands in round
+ * - Bid 0, incorrect: -10 × hands in round
+ * - Bonus points: Only added when bid exactly equals tricks taken
+ *
+ * @param {number} bid - The number of tricks the player bid (0 or higher)
  * @param {number} tricksTaken - The actual number of tricks taken
  * @param {number} handsInRound - The total number of hands/rounds in play
- * @param {number} bonusPoints - Bonus points awarded (only applied if bid is correct)
- * @returns {Object} ScoreCalculation object with totalScore, baseScore, bonusScore, and breakdown
+ * @param {number} [bonusPoints=0] - Optional bonus points to add (only if bid is correct)
+ * @returns {ScoreCalculation} Object containing totalScore, breakdown details, and scenario info
+ * @throws {Error} If parameters are invalid
  */
-function calculateScore(bid, tricksTaken, handsInRound, bonusPoints) {
+function calculateScore(bid, tricksTaken, handsInRound, bonusPoints = 0) {
   // Input validation
   if (typeof bid !== 'number' || bid < 0) {
-    throw new Error('Bid must be a non-negative number');
+    throw new Error('Invalid bid: must be a non-negative number');
   }
   if (typeof tricksTaken !== 'number' || tricksTaken < 0) {
-    throw new Error('Tricks taken must be a non-negative number');
+    throw new Error('Invalid tricksTaken: must be a non-negative number');
   }
-  if (typeof handsInRound !== 'number' || handsInRound < 0) {
-    throw new Error('Hands in round must be a non-negative number');
+  if (typeof handsInRound !== 'number' || handsInRound < 1) {
+    throw new Error('Invalid handsInRound: must be a positive number');
   }
   if (typeof bonusPoints !== 'number' || bonusPoints < 0) {
-    throw new Error('Bonus points must be a non-negative number');
+    throw new Error('Invalid bonusPoints: must be a non-negative number');
   }
 
+  // Determine if bid is correct
+  const isCorrectBid = bid === tricksTaken;
+
+  // Initialize score components
   let baseScore = 0;
   let bonusScore = 0;
-  let breakdown = '';
+  let scenario = '';
 
-  // Check if bid was correct (exact match)
-  const bidCorrect = bid === tricksTaken;
-
+  // Apply scoring rules based on bid type and correctness
   if (bid === 0) {
-    // Bid 0 special rules: 10 points per hand if correct, -10 per hand if wrong
-    if (bidCorrect) {
-      baseScore = handsInRound * 10;
-      breakdown = `Zero bid successful: ${handsInRound} hands × 10 = ${baseScore}`;
+    // Bid 0 scenario
+    if (isCorrectBid) {
+      // Bid 0, correct: 10 × hands in round
+      baseScore = 10 * handsInRound;
+      scenario = 'Bid 0 (correct)';
     } else {
-      baseScore = handsInRound * -10;
-      breakdown = `Zero bid failed: ${handsInRound} hands × -10 = ${baseScore}`;
+      // Bid 0, incorrect: -10 × hands in round
+      baseScore = -10 * handsInRound;
+      scenario = 'Bid 0 (incorrect)';
     }
   } else {
-    // Bid 1+: 20 points per trick if correct, -10 per difference if wrong
-    if (bidCorrect) {
-      baseScore = bid * 20;
-      bonusScore = bonusPoints;
-      breakdown = `${bid} tricks × 20 = ${baseScore}, bonus: ${bonusScore}`;
+    // Bid 1+ scenario
+    if (isCorrectBid) {
+      // Bid 1+, correct: 20 × tricks taken
+      baseScore = 20 * tricksTaken;
+      scenario = `Bid ${bid} (correct)`;
     } else {
-      const difference = Math.abs(bid - tricksTaken);
-      baseScore = -10 * difference;
-      breakdown = `Missed by ${difference} tricks: ${baseScore}`;
+      // Bid 1+, incorrect: -10 × |bid - tricks taken|
+      baseScore = -10 * Math.abs(bid - tricksTaken);
+      scenario = `Bid ${bid} (incorrect, off by ${Math.abs(bid - tricksTaken)})`;
     }
+  }
+
+  // Add bonus points only if bid is correct
+  if (isCorrectBid && bonusPoints > 0) {
+    bonusScore = bonusPoints;
   }
 
   const totalScore = baseScore + bonusScore;
@@ -61,7 +88,8 @@ function calculateScore(bid, tricksTaken, handsInRound, bonusPoints) {
     totalScore: totalScore,
     baseScore: baseScore,
     bonusScore: bonusScore,
-    breakdown: breakdown
+    isCorrectBid: isCorrectBid,
+    scenario: scenario
   };
 }
 
