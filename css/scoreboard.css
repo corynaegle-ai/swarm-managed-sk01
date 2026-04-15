@@ -1,0 +1,334 @@
+/**
+ * Scoreboard Styling - Pirate Theme
+ * Treasure chest colors, pirate fonts, and maritime elements
+ */
+
+/* Pirate Color Palette */
+:root {
+  --pirate-dark: #2c1810;
+  --pirate-brown: #5a3a2a;
+  --pirate-gold: #d4af37;
+  --pirate-light-gold: #f4d03f;
+  --pirate-cream: #f5deb3;
+  --pirate-dark-gold: #aa8c2c;
+  --pirate-accent: #8b4513;
+  --pirate-border: #3d2817;
+}
+
+/* Main Scoreboard Container */
+.scoreboard {
+  background: linear-gradient(135deg, var(--pirate-dark) 0%, var(--pirate-brown) 100%);
+  border: 3px solid var(--pirate-gold);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 
+    0 8px 16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(244, 208, 63, 0.2);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: var(--pirate-cream);
+  display: none;
+}
+
+.scoreboard--visible {
+  display: block;
+}
+
+/* Scoreboard Title */
+.scoreboard__title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--pirate-light-gold);
+  margin: 0 0 24px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  letter-spacing: 2px;
+}
+
+/* Table Styling */
+.scoreboard__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--pirate-gold);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Table Header */
+.scoreboard__header-row {
+  background: linear-gradient(135deg, var(--pirate-accent) 0%, var(--pirate-brown) 100%);
+  border-bottom: 2px solid var(--pirate-gold);
+}
+
+.scoreboard__header-cell {
+  padding: 16px 12px;
+  text-align: center;
+  font-weight: bold;
+  color: var(--pirate-light-gold);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-right: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.scoreboard__header-cell:last-child {
+  border-right: none;
+}
+
+/* Table Body Rows */
+.scoreboard__body-row {
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.scoreboard__body-row:hover {
+  background-color: rgba(212, 175, 55, 0.1);
+}
+
+.scoreboard__body-row:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.scoreboard__body-row:last-child {
+  border-bottom: none;
+}
+
+/* Table Cells */
+.scoreboard__cell {
+  padding: 14px 12px;
+  text-align: center;
+  color: var(--pirate-cream);
+  font-size: 14px;
+  border-right: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.scoreboard__cell:last-child {
+  border-right: none;
+}
+
+/* Rank Cell */
+.scoreboard__rank-cell {
+  font-weight: bold;
+  color: var(--pirate-light-gold);
+  min-width: 40px;
+}
+
+/* Name Cell */
+.scoreboard__name-cell {
+  text-align: left;
+  font-weight: 600;
+  color: var(--pirate-light-gold);
+  min-width: 150px;
+}
+
+/* Score Cells */
+.scoreboard__score-cell {
+  min-width: 50px;
+  font-weight: 500;
+  color: var(--pirate-cream);
+}
+
+.scoreboard__score-cell--current-round {
+  background-color: rgba(212, 175, 55, 0.25);
+  color: var(--pirate-light-gold);
+  font-weight: bold;
+  border-radius: 4px;
+  box-shadow: inset 0 0 8px rgba(244, 208, 63, 0.3);
+}
+
+/* Total Score Cell */
+.scoreboard__total-cell {
+  font-weight: bold;
+  color: var(--pirate-light-gold);
+  background-color: rgba(212, 175, 55, 0.15);
+  border-left: 2px solid var(--pirate-gold);
+}
+
+/* Current Round Section */
+.scoreboard__current-round {
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.4) 0%, rgba(90, 58, 42, 0.4) 100%);
+  border: 2px dashed var(--pirate-gold);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.scoreboard__current-round-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--pirate-light-gold);
+  margin: 0 0 12px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.scoreboard__current-round-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scoreboard__current-round-item {
+  padding: 10px 12px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-left: 4px solid var(--pirate-gold);
+  border-radius: 4px;
+  color: var(--pirate-cream);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scoreboard__medal {
+  font-size: 20px;
+  min-width: 30px;
+}
+
+.scoreboard__player-info {
+  flex: 1;
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 768px) {
+  .scoreboard {
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .scoreboard__title {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .scoreboard__header-cell,
+  .scoreboard__cell {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+
+  .scoreboard__name-cell {
+    min-width: 100px;
+  }
+
+  .scoreboard__score-cell {
+    min-width: 40px;
+  }
+
+  .scoreboard__current-round {
+    padding: 12px;
+    margin-top: 12px;
+  }
+
+  .scoreboard__current-round-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .scoreboard__current-round-item {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .scoreboard__medal {
+    font-size: 18px;
+    min-width: 25px;
+  }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 480px) {
+  .scoreboard {
+    padding: 12px;
+    margin: 12px 0;
+    border-width: 2px;
+    border-radius: 8px;
+  }
+
+  .scoreboard__title {
+    font-size: 18px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .scoreboard__table {
+    margin-bottom: 16px;
+    border: 1px solid var(--pirate-gold);
+  }
+
+  .scoreboard__header-cell,
+  .scoreboard__cell {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+
+  .scoreboard__header-cell {
+    font-weight: 600;
+  }
+
+  .scoreboard__rank-cell {
+    min-width: 30px;
+  }
+
+  .scoreboard__name-cell {
+    min-width: 80px;
+    font-size: 12px;
+  }
+
+  .scoreboard__score-cell {
+    min-width: 30px;
+  }
+
+  .scoreboard__total-cell {
+    min-width: 35px;
+  }
+
+  .scoreboard__current-round {
+    padding: 10px;
+    margin-top: 10px;
+    border-width: 1px;
+    border-radius: 6px;
+  }
+
+  .scoreboard__current-round-title {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .scoreboard__current-round-list {
+    gap: 6px;
+  }
+
+  .scoreboard__current-round-item {
+    padding: 6px 8px;
+    border-left-width: 3px;
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .scoreboard__medal {
+    font-size: 16px;
+    min-width: 22px;
+  }
+}
+
+/* Animation for showing scoreboard */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scoreboard--visible {
+  animation: slideIn 0.3s ease-out;
+}
