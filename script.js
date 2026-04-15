@@ -1,246 +1,234 @@
 /**
- * Pirate Theme JavaScript Component
- * Alpine.js reactive component for theme management, interactions, and responsive behavior
+ * Pirate Theme JavaScript - Interactive Functionality
+ * Handles Alpine.js reactivity, theme management, and DOM interactions
+ * Uses CSS class addition/removal only - NO inline styles
  */
 
+/**
+ * Alpine.js data object for pirate theme
+ * Manages reactive state for theme switching, sailing mode, and screen size
+ */
 function pirateTheme() {
   return {
-    // State management
+    // Theme state
     isDarkMode: false,
     isSailingMode: false,
-    screenSize: 'desktop', // 'mobile', 'tablet', 'desktop'
-    isInitialized: false,
-
+    currentBreakpoint: 'desktop',
+    
     /**
-     * Initialize the component
-     * Called via Alpine.js @alpine:init directive
+     * Initialize the theme on Alpine init
      */
     init() {
-      // Load preferences from localStorage
-      this.loadPreferences();
-
-      // Set initial screen size class
-      this.updateScreenSize();
-
-      // Apply initial theme classes to root
+      // Load persisted theme from localStorage
+      this.loadThemeFromStorage();
+      
+      // Set initial responsive breakpoint
+      this.updateResponsiveBreakpoint();
+      
+      // Apply initial theme classes
       this.applyThemeClasses();
-
-      // Apply initial responsive classes
-      this.applyResponsiveClasses();
-
-      // Set up event listeners
+      
+      // Setup event listeners
       this.setupEventListeners();
-
-      // Mark as initialized
-      this.isInitialized = true;
-      document.documentElement.classList.add('pirate-ready');
+      
+      // Add initial CSS class to mark as ready
+      this.addClassToRoot('pirate-ready');
     },
-
+    
     /**
-     * Load theme preferences from localStorage
+     * Load theme preference from localStorage
      */
-    loadPreferences() {
-      const savedDarkMode = localStorage.getItem('pirate-dark-mode');
-      const savedSailingMode = localStorage.getItem('pirate-sailing-mode');
-
-      if (savedDarkMode !== null) {
-        this.isDarkMode = savedDarkMode === 'true';
-      } else {
-        // Default to light mode
-        this.isDarkMode = false;
-      }
-
-      if (savedSailingMode !== null) {
-        this.isSailingMode = savedSailingMode === 'true';
-      } else {
-        // Default to no sailing mode
-        this.isSailingMode = false;
+    loadThemeFromStorage() {
+      try {
+        const stored = localStorage.getItem('pirateTheme');
+        if (stored) {
+          const theme = JSON.parse(stored);
+          this.isDarkMode = theme.isDarkMode || false;
+          this.isSailingMode = theme.isSailingMode || false;
+        }
+      } catch (error) {
+        console.warn('Failed to load theme from localStorage:', error);
       }
     },
-
+    
     /**
-     * Save theme preferences to localStorage
+     * Save theme preference to localStorage
      */
-    savePreferences() {
-      localStorage.setItem('pirate-dark-mode', this.isDarkMode);
-      localStorage.setItem('pirate-sailing-mode', this.isSailingMode);
+    saveThemeToStorage() {
+      try {
+        const theme = {
+          isDarkMode: this.isDarkMode,
+          isSailingMode: this.isSailingMode
+        };
+        localStorage.setItem('pirateTheme', JSON.stringify(theme));
+      } catch (error) {
+        console.warn('Failed to save theme to localStorage:', error);
+      }
     },
-
+    
     /**
-     * Toggle between light and dark theme
+     * Toggle dark/light mode theme
      */
     toggleTheme() {
-      document.documentElement.classList.add('pirate-theme-switching');
-
       this.isDarkMode = !this.isDarkMode;
-      this.savePreferences();
       this.applyThemeClasses();
-
-      // Remove transition class after animation completes
-      setTimeout(() => {
-        document.documentElement.classList.remove('pirate-theme-switching');
-      }, 600);
+      this.saveThemeToStorage();
     },
-
+    
     /**
-     * Toggle sailing mode (animations)
+     * Toggle sailing mode animations
      */
     toggleSailingMode() {
       this.isSailingMode = !this.isSailingMode;
-      this.savePreferences();
       this.applyThemeClasses();
+      this.saveThemeToStorage();
     },
-
+    
     /**
-     * Apply theme classes to root element
-     * Only uses class addition/removal, no inline styles
+     * Apply theme CSS classes to root element
+     * Uses only CSS class addition/removal - NO inline styles
      */
     applyThemeClasses() {
       const root = document.documentElement;
-
-      // Apply dark mode class
+      
+      // Remove all existing theme classes
+      root.classList.remove(
+        'pirate-light-mode',
+        'pirate-dark-mode',
+        'pirate-sailing',
+        'pirate-no-sailing'
+      );
+      
+      // Add theme mode class
       if (this.isDarkMode) {
-        root.classList.add('pirate-dark-mode');
-        root.classList.remove('pirate-light-mode');
+        this.addClassToRoot('pirate-dark-mode');
       } else {
-        root.classList.remove('pirate-dark-mode');
-        root.classList.add('pirate-light-mode');
+        this.addClassToRoot('pirate-light-mode');
       }
-
-      // Apply sailing mode class
+      
+      // Add sailing mode class
       if (this.isSailingMode) {
-        root.classList.add('pirate-sailing');
-        root.classList.remove('pirate-no-sailing');
+        this.addClassToRoot('pirate-sailing');
       } else {
-        root.classList.remove('pirate-sailing');
-        root.classList.add('pirate-no-sailing');
+        this.addClassToRoot('pirate-no-sailing');
       }
+      
+      // Apply responsive breakpoint class
+      this.applyResponsiveClasses();
     },
-
+    
     /**
-     * Update screen size detection
+     * Update responsive breakpoint based on window size
      */
-    updateScreenSize() {
+    updateResponsiveBreakpoint() {
       const width = window.innerWidth;
-
+      
       if (width < 768) {
-        this.screenSize = 'mobile';
+        this.currentBreakpoint = 'mobile';
       } else if (width < 1024) {
-        this.screenSize = 'tablet';
+        this.currentBreakpoint = 'tablet';
       } else {
-        this.screenSize = 'desktop';
+        this.currentBreakpoint = 'desktop';
       }
     },
-
+    
     /**
-     * Apply responsive behavior classes based on screen size
+     * Apply responsive CSS classes based on current breakpoint
      */
     applyResponsiveClasses() {
       const root = document.documentElement;
-
-      // Remove all responsive classes
+      
+      // Remove all existing responsive classes
       root.classList.remove('pirate-mobile', 'pirate-tablet', 'pirate-desktop');
-
+      
       // Add appropriate responsive class
-      switch (this.screenSize) {
+      switch (this.currentBreakpoint) {
         case 'mobile':
-          root.classList.add('pirate-mobile');
+          this.addClassToRoot('pirate-mobile');
           break;
         case 'tablet':
-          root.classList.add('pirate-tablet');
+          this.addClassToRoot('pirate-tablet');
           break;
         case 'desktop':
-          root.classList.add('pirate-desktop');
+          this.addClassToRoot('pirate-desktop');
           break;
       }
     },
-
+    
     /**
-     * Set up event listeners for interactions
+     * Helper to safely add class to root element
+     */
+    addClassToRoot(className) {
+      document.documentElement.classList.add(className);
+    },
+    
+    /**
+     * Setup event listeners for interactive elements
      */
     setupEventListeners() {
-      // Handle window resize for responsive behavior
-      window.addEventListener('resize', () => {
-        const previousSize = this.screenSize;
-        this.updateScreenSize();
-
-        if (previousSize !== this.screenSize) {
-          this.applyResponsiveClasses();
+      // Theme toggle button click handler
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('[data-theme-toggle], button[x-on\\:click="toggleTheme"]')) {
+          this.toggleTheme();
         }
       });
-
-      // Add hover effects to interactive elements (delegated)
-      document.addEventListener('mouseenter', this.handleElementHover.bind(this), true);
-      document.addEventListener('mouseleave', this.handleElementLeave.bind(this), true);
+      
+      // Sailing mode toggle button click handler
+      document.addEventListener('click', (e) => {
+        if (e.target.matches('[data-sailing-toggle], button[x-on\\:click="toggleSailingMode"]')) {
+          this.toggleSailingMode();
+        }
+      });
+      
+      // Hover effects for interactive elements
+      document.addEventListener('mouseenter', (e) => {
+        if (e.target.matches('a[data-pirate-anchor], .pirate-interactive, button')) {
+          this.addInteractiveHoverClass(e.target);
+        }
+      }, true);
+      
+      document.addEventListener('mouseleave', (e) => {
+        if (e.target.matches('a[data-pirate-anchor], .pirate-interactive, button')) {
+          this.removeInteractiveHoverClass(e.target);
+        }
+      }, true);
+      
+      // Window resize handler for responsive behavior
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          this.updateResponsiveBreakpoint();
+          this.applyResponsiveClasses();
+        }, 100);
+      });
     },
-
+    
     /**
-     * Handle hover enter on interactive elements
-     * Adds CSS classes instead of inline styles
+     * Add hover class to interactive element
+     * Only adds CSS class - no inline styles
      */
-    handleElementHover(event) {
-      const target = event.target;
-
-      // Add hover class to links
-      if (target.tagName === 'A') {
-        target.classList.add('pirate-link-active');
-        target.classList.add('pirate-hover-active');
-      }
-
-      // Add hover class to buttons
-      if (target.tagName === 'BUTTON') {
-        target.classList.add('pirate-button-hover');
-      }
-
-      // Add hover class to interactive elements with data attribute
-      if (target.hasAttribute('data-pirate-interactive')) {
-        target.classList.add('pirate-hover-active');
-      }
-    },
-
-    /**
-     * Handle hover leave on interactive elements
-     * Removes CSS classes
-     */
-    handleElementLeave(event) {
-      const target = event.target;
-
-      // Remove hover class from links
-      if (target.tagName === 'A') {
-        target.classList.remove('pirate-link-active');
-        target.classList.remove('pirate-hover-active');
-      }
-
-      // Remove hover class from buttons
-      if (target.tagName === 'BUTTON') {
-        target.classList.remove('pirate-button-hover');
-      }
-
-      // Remove hover class from interactive elements
-      if (target.hasAttribute('data-pirate-interactive')) {
-        target.classList.remove('pirate-hover-active');
+    addInteractiveHoverClass(element) {
+      if (element.matches('a[data-pirate-anchor]')) {
+        element.classList.add('pirate-link-active');
+      } else if (element.matches('button')) {
+        element.classList.add('pirate-button-hover');
+      } else {
+        element.classList.add('pirate-hover-active');
       }
     },
-
+    
     /**
-     * Get current theme name
+     * Remove hover class from interactive element
      */
-    getThemeName() {
-      return this.isDarkMode ? 'dark' : 'light';
-    },
-
-    /**
-     * Get sailing mode status
-     */
-    getSailingStatus() {
-      return this.isSailingMode ? 'active' : 'inactive';
-    },
-
-    /**
-     * Get responsive breakpoint name
-     */
-    getResponsiveBreakpoint() {
-      return this.screenSize;
+    removeInteractiveHoverClass(element) {
+      if (element.matches('a[data-pirate-anchor]')) {
+        element.classList.remove('pirate-link-active');
+      } else if (element.matches('button')) {
+        element.classList.remove('pirate-button-hover');
+      } else {
+        element.classList.remove('pirate-hover-active');
+      }
     }
   };
 }
