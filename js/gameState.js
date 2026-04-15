@@ -70,6 +70,10 @@ function getCurrentRound() {
  * Mark the current phase as complete
  */
 function completePhase() {
+  if (!gameState.phaseComplete.hasOwnProperty(gameState.currentPhase)) {
+    console.warn(`Phase '${gameState.currentPhase}' not found in phaseComplete`);
+    return;
+  }
   gameState.phaseComplete[gameState.currentPhase] = true;
 }
 
@@ -119,8 +123,9 @@ function advancePhase() {
 
   // Advance to next phase within current round
   const nextPhaseIndex = currentPhaseIndex + 1;
-  gameState.currentPhase = PHASE_ORDER[nextPhaseIndex];
-  gameState.phaseComplete[gameState.currentPhase] = false;
+  const nextPhase = PHASE_ORDER[nextPhaseIndex];
+  gameState.currentPhase = nextPhase;
+  gameState.phaseComplete[nextPhase] = false;
   return true;
 }
 

@@ -37,7 +37,8 @@ function calculateScore(bid, tricksTaken, handsInRound, bonusPoints = 0) {
     // Bid 0 special rules: 10 points per hand if correct, -10 per hand if wrong
     if (bidCorrect) {
       baseScore = handsInRound * 10;
-      breakdown = `Zero bid successful: ${handsInRound} hands × 10 = ${baseScore}`;
+      bonusScore = bonusPoints;
+      breakdown = `Zero bid successful: ${handsInRound} hands × 10 = ${baseScore}, bonus: ${bonusScore}`;
     } else {
       baseScore = handsInRound * -10;
       breakdown = `Zero bid failed: ${handsInRound} hands × -10 = ${baseScore}`;
