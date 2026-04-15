@@ -61,6 +61,99 @@
 
         <!-- Main Content Area -->
         <main class="container mx-auto px-4 py-16">
+            <!-- Player Setup Section -->
+            <section id="player-setup" class="mb-16">
+                <div x-data="playerSetupComponent()" class="max-w-2xl mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-amber-300 mb-8 text-center">
+                        Player Setup
+                    </h2>
+                    
+                    <div class="card-pirate p-8 rounded-lg">
+                        <!-- Add Player Form -->
+                        <div class="mb-6">
+                            <label for="player-name-input" class="block text-amber-300 font-bold mb-2">
+                                Add Player Name
+                            </label>
+                            <div class="flex gap-2">
+                                <input
+                                    type="text"
+                                    id="player-name-input"
+                                    x-model="newPlayerName"
+                                    @keyup.enter="addPlayer()"
+                                    class="input-pirate flex-1 px-4 py-2 rounded border-2 border-amber-600 bg-gray-800 text-amber-100 focus:outline-none focus:border-amber-300 transition"
+                                    placeholder="Enter player name"
+                                >
+                                <button
+                                    @click="addPlayer()"
+                                    class="btn-pirate px-6 py-2 rounded font-semibold whitespace-nowrap"
+                                >
+                                    Add Player
+                                </button>
+                            </div>
+                            <p x-show="errorMessage" class="text-red-400 text-sm mt-2" x-text="errorMessage"></p>
+                        </div>
+
+                        <!-- Player Count Info -->
+                        <div class="mb-6 p-4 bg-gray-800 rounded border border-amber-600">
+                            <p class="text-amber-300 font-semibold">
+                                Players Added: <span x-text="players.length"></span>/8
+                            </p>
+                            <p class="text-gray-400 text-sm mt-1">
+                                Valid player count: 2-8 players required to start
+                            </p>
+                        </div>
+
+                        <!-- Player List -->
+                        <div class="mb-6">
+                            <h3 class="text-amber-300 font-bold mb-4">Player List</h3>
+                            <div x-show="players.length === 0" class="text-center text-gray-400 py-4">
+                                No players added yet. Add at least 2 players to start!
+                            </div>
+                            <div x-show="players.length > 0" class="space-y-2">
+                                <template x-for="(player, index) in players" :key="index">
+                                    <div class="flex justify-between items-center bg-gray-800 p-3 rounded border border-amber-700">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-amber-300 font-bold" x-text="index + 1 + '.""></span>
+                                            <span class="text-amber-100" x-text="player"></span>
+                                        </div>
+                                        <button
+                                            @click="removePlayer(index)"
+                                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-semibold transition"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Validation Message -->
+                        <div x-show="players.length < 2" class="mb-6 p-3 bg-yellow-900 rounded border border-yellow-600">
+                            <p class="text-yellow-200 text-sm font-semibold">
+                                ⚠️ Need at least 2 players to start the game
+                            </p>
+                        </div>
+                        <div x-show="players.length > 8" class="mb-6 p-3 bg-red-900 rounded border border-red-600">
+                            <p class="text-red-200 text-sm font-semibold">
+                                ❌ Cannot have more than 8 players
+                            </p>
+                        </div>
+
+                        <!-- Start Game Button -->
+                        <button
+                            @click="startGame()"
+                            :disabled="players.length < 2 || players.length > 8"
+                            :class="{
+                                'btn-pirate btn-treasure w-full py-3 rounded-lg font-bold uppercase tracking-wider': true,
+                                'opacity-50 cursor-not-allowed': players.length < 2 || players.length > 8
+                            }"
+                        >
+                            Start Game with <span x-text="players.length"></span> Players
+                        </button>
+                    </div>
+                </div>
+            </section>
+
             <!-- Adventures Section -->
             <section id="adventures" class="mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-amber-300 mb-12 text-center">
@@ -206,5 +299,84 @@
             </div>
         </footer>
     </div>
+
+    <script>
+        // Player Setup Component
+        function playerSetupComponent() {
+            return {
+                players: [],
+                newPlayerName: '',
+                errorMessage: '',
+
+                addPlayer() {
+                    this.errorMessage = '';
+                    
+                    // Validate input
+                    if (!this.newPlayerName.trim()) {
+                        this.errorMessage = 'Player name cannot be empty';
+                        return;
+                    }
+
+                    if (this.newPlayerName.trim().length < 2) {
+                        this.errorMessage = 'Player name must be at least 2 characters';
+                        return;
+                    }
+
+                    // Check player limit
+                    if (this.players.length >= 8) {
+                        this.errorMessage = 'Maximum 8 players allowed';
+                        return;
+                    }
+
+                    // Check for duplicates
+                    if (this.players.includes(this.newPlayerName.trim())) {
+                        this.errorMessage = 'Player name already exists';
+                        return;
+                    }
+
+                    // Add player and clear input
+                    this.players.push(this.newPlayerName.trim());
+                    this.newPlayerName = '';
+                },
+
+                removePlayer(index) {
+                    this.players.splice(index, 1);
+                    this.errorMessage = '';
+                },
+
+                startGame() {
+                    if (this.players.length < 2 || this.players.length > 8) {
+                        this.errorMessage = 'Invalid player count for game start';
+                        return;
+                    }
+                    
+                    // Trigger game start - would connect to game logic
+                    console.log('Game starting with players:', this.players);
+                    alert(`Game starting with ${this.players.length} players: ${this.players.join(', ')}`);
+                }
+            };
+        }
+
+        // Theme Data Component (from original)
+        function themeData() {
+            return {
+                menuOpen: false,
+                formData: {
+                    name: '',
+                    message: ''
+                },
+                formSubmitted: false,
+
+                handleFormSubmit() {
+                    this.formSubmitted = true;
+                    this.formData.name = '';
+                    this.formData.message = '';
+                    setTimeout(() => {
+                        this.formSubmitted = false;
+                    }, 3000);
+                }
+            };
+        }
+    </script>
 </body>
 </html>
