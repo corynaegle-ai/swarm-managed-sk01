@@ -143,63 +143,69 @@ a:hover {
    ============================================================ */
 
 /* Mobile (< 768px) */
-:root.pirate-mobile #app {
-  padding: 1rem;
-  font-size: 14px;
-}
+@media (max-width: 767px) {
+  #app {
+    padding: 1rem;
+    font-size: 14px;
+  }
 
-:root.pirate-mobile h1 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-}
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
 
-:root.pirate-mobile h2 {
-  font-size: 1.4rem;
-}
+  h2 {
+    font-size: 1.4rem;
+  }
 
-:root.pirate-mobile p {
-  font-size: 14px;
-  line-height: 1.5;
+  p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
 }
 
 /* Tablet (768px - 1023px) */
-:root.pirate-tablet #app {
-  padding: 1.5rem;
-  font-size: 15px;
-}
+@media (min-width: 768px) and (max-width: 1023px) {
+  #app {
+    padding: 1.5rem;
+    font-size: 15px;
+  }
 
-:root.pirate-tablet h1 {
-  font-size: 2rem;
-  margin-bottom: 1.2rem;
-}
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+  }
 
-:root.pirate-tablet h2 {
-  font-size: 1.6rem;
-}
+  h2 {
+    font-size: 1.6rem;
+  }
 
-:root.pirate-tablet p {
-  font-size: 15px;
-  line-height: 1.6;
+  p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
 }
 
 /* Desktop (>= 1024px) */
-:root.pirate-desktop #app {
-  padding: 2rem;
-  font-size: 16px;
-}
+@media (min-width: 1024px) {
+  #app {
+    padding: 2rem;
+    font-size: 16px;
+  }
 
-:root.pirate-desktop h1 {
-  font-size: 2.4rem;
-  margin-bottom: 1.5rem;
-}
+  h1 {
+    font-size: 2.4rem;
+    margin-bottom: 1.5rem;
+  }
 
-:root.pirate-desktop h2 {
-  font-size: 1.8rem;
-}
+  h2 {
+    font-size: 1.8rem;
+  }
 
-:root.pirate-desktop p {
-  font-size: 16px;
-  line-height: 1.8;
+  p {
+    font-size: 16px;
+    line-height: 1.8;
+  }
 }
 
 /* ============================================================
@@ -352,6 +358,36 @@ button[x-on\:click="toggleSailingMode"]:hover {
 :root.pirate-light-mode html {
   background-color: #FFF8DC;
   color: #1a1a1a;
+}
+
+/* ============================================================
+   INTERACTIVE STATES - JS-Managed Classes
+   ============================================================ */
+
+/* Hover state for interactive elements */
+.pirate-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--pirate-shadow);
+}
+
+/* Active/pressed state */
+.pirate-interactive:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px var(--pirate-shadow);
+}
+
+/* State for sailing mode active */
+.pirate-sailing-active button[data-sailing-toggle],
+.pirate-sailing-active button[x-on\:click="toggleSailingMode"] {
+  background-color: #FF4500;
+  box-shadow: 0 0 12px rgba(255, 69, 0, 0.4);
+}
+
+/* State for dark mode active */
+.pirate-dark-active button[data-theme-toggle],
+.pirate-dark-active button[x-on\:click="toggleTheme"] {
+  background-color: #FFC700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 /* ============================================================
