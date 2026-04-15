@@ -11,7 +11,7 @@
  * @param {number} bonusPoints - Bonus points awarded (only applied if bid is correct)
  * @returns {Object} ScoreCalculation object with totalScore, baseScore, bonusScore, and breakdown
  */
-function calculateScore(bid, tricksTaken, handsInRound, bonusPoints) {
+function calculateScore(bid, tricksTaken, handsInRound, bonusPoints = 0) {
   // Input validation
   if (typeof bid !== 'number' || bid < 0) {
     throw new Error('Bid must be a non-negative number');
