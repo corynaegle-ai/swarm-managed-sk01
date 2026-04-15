@@ -1,0 +1,102 @@
+.score-card {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.score-card-header {
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
+}
+
+.score-card-header h2 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.bid-target {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.bid-target strong {
+  color: #4CAF50;
+  font-size: 16px;
+}
+
+.scores-table {
+  margin-top: 20px;
+}
+
+.scores-table h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #333;
+  font-size: 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+table thead {
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #ddd;
+}
+
+table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+table tbody tr.correct-bid {
+  background-color: #f0f8f0;
+}
+
+table tbody tr.incorrect-bid {
+  background-color: #fff5f5;
+}
+
+.total-score {
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  min-width: 30px;
+}
+
+.badge-success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.badge-danger {
+  background-color: #f44336;
+  color: white;
+}
