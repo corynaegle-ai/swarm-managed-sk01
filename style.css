@@ -32,3 +32,83 @@ p {
     font-size: 1rem;
     color: #666;
 }
+
+/* Game Flow Styles */
+.phase-indicator {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 4px;
+    font-weight: 500;
+    background-color: #e0e0e0;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.phase-indicator.active {
+    background-color: #4CAF50;
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.round-counter {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #222;
+    margin: 1rem 0;
+}
+
+.next-phase-button {
+    padding: 0.75rem 1.5rem;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.next-phase-button:hover:not(:disabled) {
+    background-color: #1976D2;
+}
+
+.next-phase-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.game-completion-screen {
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 2rem;
+    border: 2px solid #4CAF50;
+}
+
+.game-completion-screen h2 {
+    font-size: 1.8rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.restart-button {
+    padding: 0.75rem 1.5rem;
+    background-color: #FF9800;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+.restart-button:hover {
+    background-color: #F57C00;
+}
