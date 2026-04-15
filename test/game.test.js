@@ -1,209 +1,351 @@
 /**
- * Unit tests for GameStateManager
+ * Test suite for game state management
+ * Tests calculateRoundScores, getPlayerScore, updatePlayerScore, and game state tracking
  */
 
-const { GameStateManager } = require('../js/game.js');
+// Mock the scoring engine
+global.calculateScore = function(bid, tricks) {
+  if (bid === tricks) {
+    return 10 + tricks;
+  }
+  return Math.max(0, tricks - bid);
+};
 
-describe('GameStateManager', () => {
-  let gameManager;
+// Load the game module
+const {
+  gameState,
+  calculateRoundScores,
+  getPlayerScore,
+  updatePlayerScore,
+  getAllScores,
+  getRoundData,
+  getGameHistory,
+  initializeGame,
+  resetGameState
+} = require('../js/game.js');
 
+describe('Game State Management', () => {
   beforeEach(() => {
-    gameManager = new GameStateManager();
+    resetGameState();
   });
 
-  describe('initializeGame', () => {
-    it('should initialize game with players', () => {
+  describe('Game Initialization', () => {
+    test('should initialize game with players and rounds', () => {
       const players = [
-        { name: 'Alice' },
-        { name: 'Bob' },
-        { name: 'Charlie' }
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
       ];
+      initializeGame(players, 5);
 
-      gameManager.initializeGame(players, 13);
-
-      expect(gameManager.gameState.players.length).toBe(3);
-      expect(gameManager.gameState.currentRound).toBe(1);
-      expect(gameManager.gameState.maxRounds).toBe(13);
-      expect(gameManager.isInitialized).toBe(true);
+      expect(gameState.players.length).toBe(2);
+      expect(gameState.totalRounds).toBe(5);
+      expect(gameState.currentRound).toBe(1);
     });
 
-    it('should throw error if no players provided', () => {
-      expect(() => gameManager.initializeGame([])).toThrow();
-    });
-
-    it('should assign player IDs correctly', () => {
-      const players = [{ name: 'Alice' }, { name: 'Bob' }];
-      gameManager.initializeGame(players);
-
-      expect(gameManager.gameState.players[0].id).toBe('player0');
-      expect(gameManager.gameState.players[1].id).toBe('player1');
-    });
-  });
-
-  describe('updatePlayerScores', () => {
-    beforeEach(() => {
+    test('should initialize empty game scores for each player', () => {
       const players = [
-        { name: 'Alice', bid: 2 },
-        { name: 'Bob', bid: 1 },
-        { name: 'Charlie', bid: 2 }
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
       ];
-      gameManager.initializeGame(players);
+      initializeGame(players, 3);
+
+      expect(gameState.gameScores[1]).toBe(0);
+      expect(gameState.gameScores[2]).toBe(0);
     });
 
-    it('should award 10 points when tricks match bid', () => {
-      gameManager.updatePlayerScores({
-        player0: 2,
-        player1: 1,
-        player2: 2
-      });
-
-      expect(gameManager.gameState.players[0].score).toBe(10);
-      expect(gameManager.gameState.players[1].score).toBe(10);
-      expect(gameManager.gameState.players[2].score).toBe(10);
-    });
-
-    it('should penalize when tricks do not match bid', () => {
-      gameManager.updatePlayerScores({
-        player0: 3,
-        player1: 1,
-        player2: 1
-      });
-
-      // Alice bid 2, got 3: -|3-2| = -1
-      expect(gameManager.gameState.players[0].score).toBe(-1);
-      // Bob bid 1, got 1: 10 points
-      expect(gameManager.gameState.players[1].score).toBe(10);
-      // Charlie bid 2, got 1: -|1-2| = -1
-      expect(gameManager.gameState.players[2].score).toBe(-1);
-    });
-
-    it('should update tricks taken for each player', () => {
-      gameManager.updatePlayerScores({
-        player0: 2,
-        player1: 0,
-        player2: 3
-      });
-
-      expect(gameManager.gameState.players[0].tricks).toBe(2);
-      expect(gameManager.gameState.players[1].tricks).toBe(0);
-      expect(gameManager.gameState.players[2].tricks).toBe(3);
-    });
-
-    it('should track round scores', () => {
-      gameManager.updatePlayerScores({
-        player0: 2,
-        player1: 1,
-        player2: 2
-      });
-
-      expect(gameManager.gameState.players[0].roundScores[0]).toEqual({
-        round: 1,
-        bid: 2,
-        tricks: 2,
-        points: 10
-      });
-    });
-
-    it('should throw error on missing tricks for a player', () => {
+    test('should throw error with no players', () => {
       expect(() => {
-        gameManager.updatePlayerScores({
-          player0: 2,
-          player1: 1
-          // missing player2
-        });
-      }).toThrow();
+        initializeGame([], 5);
+      }).toThrow('At least one player is required');
+    });
+
+    test('should throw error with invalid rounds', () => {
+      const players = [{ id: 1, name: 'Player 1' }];
+      expect(() => {
+        initializeGame(players, 0);
+      }).toThrow('Rounds must be a positive integer');
     });
   });
 
-  describe('advanceRound', () => {
+  describe('Bid Recording', () => {
     beforeEach(() => {
-      const players = [{ name: 'Alice' }, { name: 'Bob' }];
-      gameManager.initializeGame(players, 13);
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
     });
 
-    it('should increment current round', () => {
-      expect(gameManager.gameState.currentRound).toBe(1);
-      gameManager.advanceRound();
-      expect(gameManager.gameState.currentRound).toBe(2);
+    test('should record player bid', () => {
+      gameState.recordBid(1, 5);
+      expect(gameState.getBid(1)).toBe(5);
     });
 
-    it('should reset player bids and tricks', () => {
-      gameManager.gameState.players[0].bid = 5;
-      gameManager.gameState.players[0].tricks = 3;
-      
-      gameManager.advanceRound();
-      
-      expect(gameManager.gameState.players[0].bid).toBe(0);
-      expect(gameManager.gameState.players[0].tricks).toBe(0);
+    test('should throw error for invalid player', () => {
+      expect(() => {
+        gameState.recordBid(999, 5);
+      }).toThrow('Player not found: 999');
     });
 
-    it('should deactivate game when max rounds exceeded', () => {
-      gameManager.gameState.maxRounds = 3;
-      gameManager.gameState.currentRound = 3;
-      
-      const result = gameManager.advanceRound();
-      
-      expect(result).toBe(false);
-      expect(gameManager.gameState.gameActive).toBe(false);
+    test('should throw error for negative bid', () => {
+      expect(() => {
+        gameState.recordBid(1, -1);
+      }).toThrow('Invalid bid amount: -1');
     });
 
-    it('should return true when game continues', () => {
-      const result = gameManager.advanceRound();
-      expect(result).toBe(true);
-      expect(gameManager.gameState.gameActive).toBe(true);
+    test('should throw error for non-integer bid', () => {
+      expect(() => {
+        gameState.recordBid(1, 5.5);
+      }).toThrow('Invalid bid amount: 5.5');
     });
   });
 
-  describe('getPlayerScores', () => {
+  describe('Tricks Recording', () => {
     beforeEach(() => {
-      const players = [{ name: 'Alice' }, { name: 'Bob' }];
-      gameManager.initializeGame(players);
-      gameManager.gameState.players[0].score = 15;
-      gameManager.gameState.players[0].bid = 2;
-      gameManager.gameState.players[0].tricks = 2;
-      gameManager.gameState.players[1].score = 5;
-      gameManager.gameState.players[1].bid = 1;
-      gameManager.gameState.players[1].tricks = 0;
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
     });
 
-    it('should return array of player score objects', () => {
-      const scores = gameManager.getPlayerScores();
-      expect(scores.length).toBe(2);
-      expect(scores[0].name).toBe('Alice');
-      expect(scores[0].score).toBe(15);
+    test('should record tricks taken', () => {
+      gameState.recordTricks(1, 3);
+      expect(gameState.getTricks(1)).toBe(3);
     });
 
-    it('should not return internal data structures', () => {
-      const scores = gameManager.getPlayerScores();
-      expect(scores[0].roundScores).toBeUndefined();
+    test('should throw error for invalid player', () => {
+      expect(() => {
+        gameState.recordTricks(999, 3);
+      }).toThrow('Player not found: 999');
+    });
+
+    test('should throw error for negative tricks', () => {
+      expect(() => {
+        gameState.recordTricks(1, -1);
+      }).toThrow('Invalid tricks amount: -1');
     });
   });
 
-  describe('getRoundResults', () => {
+  describe('Round Completion', () => {
     beforeEach(() => {
-      const players = [{ name: 'Alice', bid: 2 }, { name: 'Bob', bid: 1 }];
-      gameManager.initializeGame(players);
-      gameManager.updatePlayerScores({ player0: 2, player1: 1 });
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
     });
 
-    it('should return results for the last completed round', () => {
-      const results = gameManager.getRoundResults();
-      expect(results.length).toBe(2);
-      expect(results[0].bid).toBe(2);
-      expect(results[0].tricks).toBe(2);
-      expect(results[0].points).toBe(10);
+    test('should detect incomplete round', () => {
+      gameState.recordBid(1, 5);
+      expect(gameState.isRoundComplete()).toBe(false);
     });
 
-    it('should return results for a specific round', () => {
-      gameManager.advanceRound();
-      gameManager.gameState.players[0].bid = 3;
-      gameManager.updatePlayerScores({ player0: 1, player1: 2 });
-      
-      const round1Results = gameManager.getRoundResults(1);
-      expect(round1Results[0].tricks).toBe(2);
-      
-      const round2Results = gameManager.getRoundResults(2);
-      expect(round2Results[0].tricks).toBe(1);
+    test('should detect complete round', () => {
+      gameState.recordBid(1, 5);
+      gameState.recordBid(2, 3);
+      gameState.recordTricks(1, 5);
+      gameState.recordTricks(2, 3);
+      expect(gameState.isRoundComplete()).toBe(true);
+    });
+  });
+
+  describe('Round Score Calculation', () => {
+    beforeEach(() => {
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
+    });
+
+    test('should calculate scores for all players when round is complete', () => {
+      gameState.recordBid(1, 5);
+      gameState.recordBid(2, 3);
+      gameState.recordTricks(1, 5);
+      gameState.recordTricks(2, 3);
+
+      const roundScores = calculateRoundScores();
+
+      expect(roundScores[1]).toBe(15); // 10 + 5 for matching bid
+      expect(roundScores[2]).toBe(13); // 10 + 3 for matching bid
+    });
+
+    test('should throw error when round is incomplete', () => {
+      gameState.recordBid(1, 5);
+      expect(() => {
+        calculateRoundScores();
+      }).toThrow('Cannot calculate scores: round is not complete');
+    });
+
+    test('should update total game scores', () => {
+      gameState.recordBid(1, 5);
+      gameState.recordBid(2, 3);
+      gameState.recordTricks(1, 5);
+      gameState.recordTricks(2, 3);
+
+      calculateRoundScores();
+
+      expect(getPlayerScore(1)).toBe(15);
+      expect(getPlayerScore(2)).toBe(13);
+    });
+
+    test('should accumulate scores across multiple rounds', () => {
+      // Round 1
+      gameState.recordBid(1, 5);
+      gameState.recordBid(2, 3);
+      gameState.recordTricks(1, 5);
+      gameState.recordTricks(2, 3);
+      calculateRoundScores();
+
+      // Round 2
+      gameState.nextRound();
+      gameState.recordBid(1, 4);
+      gameState.recordBid(2, 2);
+      gameState.recordTricks(1, 4);
+      gameState.recordTricks(2, 2);
+      calculateRoundScores();
+
+      expect(getPlayerScore(1)).toBe(29); // 15 + 14
+      expect(getPlayerScore(2)).toBe(25); // 13 + 12
+    });
+  });
+
+  describe('Player Score Management', () => {
+    beforeEach(() => {
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
+    });
+
+    test('should get player score', () => {
+      updatePlayerScore(1, 25);
+      expect(getPlayerScore(1)).toBe(25);
+    });
+
+    test('should update player score', () => {
+      updatePlayerScore(1, 50);
+      expect(getPlayerScore(1)).toBe(50);
+    });
+
+    test('should throw error for invalid player ID', () => {
+      expect(() => {
+        getPlayerScore(999);
+      }).toThrow('Player not found: 999');
+    });
+
+    test('should throw error for negative score', () => {
+      expect(() => {
+        updatePlayerScore(1, -10);
+      }).toThrow('Invalid score amount: -10');
+    });
+
+    test('should get all scores', () => {
+      updatePlayerScore(1, 25);
+      updatePlayerScore(2, 30);
+      const scores = getAllScores();
+      expect(scores[1]).toBe(25);
+      expect(scores[2]).toBe(30);
+    });
+  });
+
+  describe('Round Navigation', () => {
+    beforeEach(() => {
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
+    });
+
+    test('should move to next round', () => {
+      expect(gameState.currentRound).toBe(1);
+      gameState.nextRound();
+      expect(gameState.currentRound).toBe(2);
+    });
+
+    test('should throw error when trying to advance past final round', () => {
+      gameState.currentRound = 3;
+      expect(() => {
+        gameState.nextRound();
+      }).toThrow('No more rounds available');
+    });
+
+    test('should maintain separate round data', () => {
+      gameState.recordBid(1, 5);
+      gameState.recordTricks(1, 5);
+      calculateRoundScores();
+
+      gameState.nextRound();
+      expect(gameState.getBid(1)).toBeUndefined();
+      expect(gameState.getTricks(1)).toBeUndefined();
+    });
+  });
+
+  describe('Round Data Retrieval', () => {
+    beforeEach(() => {
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
+    });
+
+    test('should get current round data', () => {
+      gameState.recordBid(1, 5);
+      gameState.recordBid(2, 3);
+      gameState.recordTricks(1, 5);
+      gameState.recordTricks(2, 3);
+      calculateRoundScores();
+
+      const roundData = getRoundData();
+      expect(roundData.round).toBe(1);
+      expect(roundData.bids[1]).toBe(5);
+      expect(roundData.bids[2]).toBe(3);
+      expect(roundData.tricks[1]).toBe(5);
+      expect(roundData.tricks[2]).toBe(3);
+    });
+  });
+
+  describe('Game History', () => {
+    test('should retrieve complete game history', () => {
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 2);
+      gameState.recordBid(1, 5);
+      gameState.recordBid(2, 3);
+      gameState.recordTricks(1, 5);
+      gameState.recordTricks(2, 3);
+      calculateRoundScores();
+
+      const history = getGameHistory();
+      expect(history.players.length).toBe(2);
+      expect(history.totalRounds).toBe(2);
+      expect(history.currentRound).toBe(1);
+      expect(history.gameScores[1]).toBe(15);
+    });
+  });
+
+  describe('Round Reset', () => {
+    beforeEach(() => {
+      const players = [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' }
+      ];
+      initializeGame(players, 3);
+    });
+
+    test('should reset current round data', () => {
+      gameState.recordBid(1, 5);
+      gameState.recordTricks(1, 3);
+      gameState.resetCurrentRound();
+
+      expect(gameState.getBid(1)).toBeUndefined();
+      expect(gameState.getTricks(1)).toBeUndefined();
     });
   });
 });
