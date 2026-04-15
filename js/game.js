@@ -1,256 +1,256 @@
 /**
  * Game State Management Module
- * Manages player bids, tricks taken, and score calculations
- * Integrates with scoring.js for score calculation
+ * Manages game state, player bids, tricks, and integrates with scoring engine
  */
 
+// Import scoring functions
 import { calculateScore } from './scoring.js';
 
 /**
- * GameState object - manages all game state
+ * Game State Object
+ * Tracks all game data including players, rounds, bids, tricks, and scores
  */
-let gameState = {
+const gameState = {
   players: [],
-  bids: {},        // { playerId: bidAmount }
-  tricks: {},      // { playerId: tricksWon }
-  scores: {},      // { playerId: totalScore }
-  roundScores: {}, // { playerId: [roundScore1, roundScore2, ...] }
   currentRound: 1,
-  totalRounds: 13
+  totalRounds: 13,
+  bids: {}, // { playerId: bid }
+  tricks: {}, // { playerId: tricksWon }
+  scores: {}, // { playerId: totalScore }
+  roundScores: {}, // { playerId: [roundScores] }
+  roundHistory: [] // Track each round's results
 };
 
 /**
  * Initialize game state with players
- * @param {Array} players - Array of player objects with { id, name }
+ * @param {Array} players - Array of player objects with id and name
  */
 function initializeGame(players) {
   gameState.players = players;
+  gameState.currentRound = 1;
   gameState.bids = {};
   gameState.tricks = {};
   gameState.scores = {};
   gameState.roundScores = {};
-  gameState.currentRound = 1;
-  
-  // Initialize scores for each player
+  gameState.roundHistory = [];
+
+  // Initialize scores and round scores for each player
   players.forEach(player => {
     gameState.scores[player.id] = 0;
     gameState.roundScores[player.id] = [];
     gameState.bids[player.id] = null;
-    gameState.tricks[player.id] = null;
+    gameState.tricks[player.id] = 0;
   });
-  
+
   return gameState;
 }
 
 /**
- * Store a player's bid
- * @param {string|number} playerId - Player ID
- * @param {number} bidAmount - Number of tricks player bids to win
- * @returns {boolean} - Success/failure
+ * Store a player's bid for the current round
+ * @param {string} playerId - The player's unique identifier
+ * @param {number} bid - The number of tricks the player bids
+ * @returns {boolean} - Success status
  */
-function setBid(playerId, bidAmount) {
+function setBid(playerId, bid) {
   if (!gameState.players.find(p => p.id === playerId)) {
-    console.error(`Player with ID ${playerId} not found`);
+    console.error(`Player ${playerId} not found in game state`);
     return false;
   }
-  
-  if (typeof bidAmount !== 'number' || bidAmount < 0) {
-    console.error(`Invalid bid amount: ${bidAmount}`);
+
+  if (typeof bid !== 'number' || bid < 0) {
+    console.error(`Invalid bid value: ${bid}`);
     return false;
   }
-  
-  gameState.bids[playerId] = bidAmount;
+
+  gameState.bids[playerId] = bid;
   return true;
 }
 
 /**
- * Store tricks taken by a player
- * @param {string|number} playerId - Player ID
- * @param {number} tricksWon - Number of tricks player won
- * @returns {boolean} - Success/failure
+ * Record tricks won by a player in the current round
+ * @param {string} playerId - The player's unique identifier
+ * @param {number} tricksWon - The number of tricks won
+ * @returns {boolean} - Success status
  */
 function setTricks(playerId, tricksWon) {
   if (!gameState.players.find(p => p.id === playerId)) {
-    console.error(`Player with ID ${playerId} not found`);
+    console.error(`Player ${playerId} not found in game state`);
     return false;
   }
-  
+
   if (typeof tricksWon !== 'number' || tricksWon < 0) {
     console.error(`Invalid tricks value: ${tricksWon}`);
     return false;
   }
-  
+
   gameState.tricks[playerId] = tricksWon;
   return true;
 }
 
 /**
- * Get a player's current total score
- * @param {string|number} playerId - Player ID
- * @returns {number} - Player's total score or -1 if not found
+ * Get the current bid for a player
+ * @param {string} playerId - The player's unique identifier
+ * @returns {number|null} - The player's bid or null if not set
  */
-function getPlayerScore(playerId) {
-  if (!(playerId in gameState.scores)) {
-    console.error(`Player with ID ${playerId} not found in scores`);
-    return -1;
-  }
-  return gameState.scores[playerId];
+function getBid(playerId) {
+  return gameState.bids[playerId] ?? null;
 }
 
 /**
- * Update a player's score
- * @param {string|number} playerId - Player ID
- * @param {number} scoreAmount - Score to add (can be negative)
- * @returns {boolean} - Success/failure
+ * Get tricks won by a player
+ * @param {string} playerId - The player's unique identifier
+ * @returns {number|null} - The tricks won or null if not set
  */
-function updatePlayerScore(playerId, scoreAmount) {
-  if (!(playerId in gameState.scores)) {
-    console.error(`Player with ID ${playerId} not found in scores`);
-    return false;
-  }
-  
-  if (typeof scoreAmount !== 'number') {
-    console.error(`Invalid score amount: ${scoreAmount}`);
-    return false;
-  }
-  
-  gameState.scores[playerId] += scoreAmount;
-  return true;
+function getTricks(playerId) {
+  return gameState.tricks[playerId] ?? null;
 }
 
 /**
- * Calculate scores for all players in current round
- * Uses scoring.js calculateScore function
- * @returns {Object} - { playerId: roundScore }
+ * Calculate scores for all players in the current round using the scoring engine
+ * @returns {object} - Object with playerId keys and calculated scores as values
  */
 function calculateRoundScores() {
-  const roundScores = {};
-  
-  // Validate that all players have bids and tricks
-  for (const player of gameState.players) {
-    if (gameState.bids[player.id] === null || gameState.bids[player.id] === undefined) {
-      console.error(`Player ${player.id} has not placed a bid`);
-      return null;
+  const roundScoresMap = {};
+
+  gameState.players.forEach(player => {
+    const playerId = player.id;
+    const bid = gameState.bids[playerId];
+    const tricksWon = gameState.tricks[playerId];
+
+    // Validate that both bid and tricks are set
+    if (bid === null || bid === undefined || tricksWon === null || tricksWon === undefined) {
+      console.warn(`Cannot calculate score for player ${playerId}: bid or tricks not set`);
+      roundScoresMap[playerId] = 0;
+      return;
     }
-    if (gameState.tricks[player.id] === null || gameState.tricks[player.id] === undefined) {
-      console.error(`Player ${player.id} trick count not set`);
-      return null;
-    }
-  }
-  
-  // Calculate score for each player using scoring engine
-  for (const player of gameState.players) {
-    const bid = gameState.bids[player.id];
-    const tricks = gameState.tricks[player.id];
-    
-    // Call scoring.js function to calculate score
-    const score = calculateScore(bid, tricks);
-    
-    roundScores[player.id] = score;
-    
-    // Store round score in history
-    if (!gameState.roundScores[player.id]) {
-      gameState.roundScores[player.id] = [];
-    }
-    gameState.roundScores[player.id].push(score);
-    
-    // Update total score
-    updatePlayerScore(player.id, score);
-  }
-  
-  return roundScores;
+
+    // Use the scoring engine to calculate the score
+    const score = calculateScore(bid, tricksWon);
+    roundScoresMap[playerId] = score;
+  });
+
+  return roundScoresMap;
 }
 
 /**
- * Reset bids and tricks for next round
- * @returns {boolean} - Success/failure
+ * Get the score for a specific player
+ * @param {string} playerId - The player's unique identifier
+ * @returns {number} - The player's total score
  */
-function nextRound() {
-  // Reset bids and tricks for next round
-  for (const player of gameState.players) {
-    gameState.bids[player.id] = null;
-    gameState.tricks[player.id] = null;
+function getPlayerScore(playerId) {
+  if (!gameState.players.find(p => p.id === playerId)) {
+    console.error(`Player ${playerId} not found in game state`);
+    return 0;
   }
-  
-  gameState.currentRound += 1;
-  
-  if (gameState.currentRound > gameState.totalRounds) {
-    console.warn('Game has ended - all rounds complete');
+
+  return gameState.scores[playerId] ?? 0;
+}
+
+/**
+ * Update a player's total score
+ * @param {string} playerId - The player's unique identifier
+ * @param {number} scoreIncrease - The amount to add to the player's score
+ * @returns {boolean} - Success status
+ */
+function updatePlayerScore(playerId, scoreIncrease) {
+  if (!gameState.players.find(p => p.id === playerId)) {
+    console.error(`Player ${playerId} not found in game state`);
     return false;
   }
-  
+
+  if (typeof scoreIncrease !== 'number') {
+    console.error(`Invalid score increase value: ${scoreIncrease}`);
+    return false;
+  }
+
+  gameState.scores[playerId] = (gameState.scores[playerId] ?? 0) + scoreIncrease;
   return true;
 }
 
 /**
- * Get current game state
- * @returns {Object} - Full game state
+ * Finalize the current round by calculating scores and advancing to the next
+ * @returns {object} - Round results with scores for each player
+ */
+function finalizeRound() {
+  const roundResults = calculateRoundScores();
+
+  // Update total scores and store round history
+  gameState.players.forEach(player => {
+    const playerId = player.id;
+    const roundScore = roundResults[playerId];
+
+    // Update total score
+    updatePlayerScore(playerId, roundScore);
+
+    // Store round score history
+    if (!gameState.roundScores[playerId]) {
+      gameState.roundScores[playerId] = [];
+    }
+    gameState.roundScores[playerId].push(roundScore);
+  });
+
+  // Store round history
+  gameState.roundHistory.push({
+    round: gameState.currentRound,
+    bids: { ...gameState.bids },
+    tricks: { ...gameState.tricks },
+    scores: roundResults
+  });
+
+  // Reset for next round
+  gameState.currentRound += 1;
+  gameState.bids = {};
+  gameState.tricks = {};
+
+  return roundResults;
+}
+
+/**
+ * Get all round scores for a player
+ * @param {string} playerId - The player's unique identifier
+ * @returns {array} - Array of scores from each round
+ */
+function getPlayerRoundScores(playerId) {
+  return gameState.roundScores[playerId] ?? [];
+}
+
+/**
+ * Get complete game state
+ * @returns {object} - The current game state
  */
 function getGameState() {
-  return { ...gameState };
+  return JSON.parse(JSON.stringify(gameState)); // Return a deep copy
 }
 
 /**
- * Get round results for display
- * @returns {Object} - Round results including bids, tricks, and scores
+ * Reset game state
  */
-function getRoundResults() {
-  const results = {};
-  
-  for (const player of gameState.players) {
-    results[player.id] = {
-      bid: gameState.bids[player.id],
-      tricks: gameState.tricks[player.id],
-      roundScore: gameState.roundScores[player.id]?.[gameState.currentRound - 1] || 0,
-      totalScore: gameState.scores[player.id]
-    };
-  }
-  
-  return results;
+function resetGame() {
+  gameState.currentRound = 1;
+  gameState.bids = {};
+  gameState.tricks = {};
+  gameState.scores = {};
+  gameState.roundScores = {};
+  gameState.roundHistory = [];
+
+  gameState.players.forEach(player => {
+    gameState.scores[player.id] = 0;
+    gameState.roundScores[player.id] = [];
+  });
 }
 
-/**
- * Get leaderboard sorted by score
- * @returns {Array} - Players sorted by score (highest first)
- */
-function getLeaderboard() {
-  return gameState.players
-    .map(player => ({
-      id: player.id,
-      name: player.name,
-      score: gameState.scores[player.id]
-    }))
-    .sort((a, b) => b.score - a.score);
-}
-
-// Export all functions for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    gameState,
-    initializeGame,
-    setBid,
-    setTricks,
-    getPlayerScore,
-    updatePlayerScore,
-    calculateRoundScores,
-    nextRound,
-    getGameState,
-    getRoundResults,
-    getLeaderboard
-  };
-}
-
-// For ES6 module usage
+// Export all functions for UI integration
 export {
-  gameState,
   initializeGame,
   setBid,
   setTricks,
+  getBid,
+  getTricks,
+  calculateRoundScores,
   getPlayerScore,
   updatePlayerScore,
-  calculateRoundScores,
-  nextRound,
+  finalizeRound,
+  getPlayerRoundScores,
   getGameState,
-  getRoundResults,
-  getLeaderboard
+  resetGame
 };
