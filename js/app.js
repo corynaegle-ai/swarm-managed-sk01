@@ -10,7 +10,7 @@ window.gameApp = function() {
     gameState: {
       currentRound: 1,
       totalRounds: 13,
-      phase: 'bidCollection', // 'bidCollection', 'playing', 'scoring'
+      phase: 'bidCollection', // 'bidCollection', 'playing', 'scoring', 'finalScores'
       players: [],
       bids: {}, // { playerId: bidAmount }
       tricks: {}, // { playerId: tricksWon }
@@ -24,6 +24,7 @@ window.gameApp = function() {
       showBidCollection: false,
       showGameBoard: false,
       showScoring: false,
+      showFinalScores: false,
       transition: false
     },
 
@@ -41,18 +42,29 @@ window.gameApp = function() {
       this.uiState.showBidCollection = false;
       this.uiState.showGameBoard = false;
       this.uiState.showScoring = false;
+      this.uiState.showFinalScores = false;
     },
 
     /**
      * Start a new game
      * @param {Array} players - Array of player objects with id and name
+     * @returns {boolean} True if game started successfully
      */
     startGame(players) {
       console.log('Starting new game with players:', players);
       
-      if (!players || players.length < 2) {
-        console.error('At least 2 players required to start game');
+      // Validate players array
+      if (!Array.isArray(players) || players.length < 2) {
+        console.error('At least 2 players required to start game. Received:', players);
         return false;
+      }
+
+      // Validate player objects have required fields
+      for (let player of players) {
+        if (!player.id || !player.name) {
+          console.error('Each player must have id and name fields. Invalid player:', player);
+          return false;
+        }
       }
 
       this.gameState.players = players;
@@ -102,6 +114,7 @@ window.gameApp = function() {
       // Hide other phases
       this.uiState.showGameBoard = false;
       this.uiState.showScoring = false;
+      this.uiState.showFinalScores = false;
       
       // Show bid collection after brief transition
       setTimeout(() => {
@@ -114,12 +127,27 @@ window.gameApp = function() {
      * Register a bid from a player
      * @param {string} playerId - Player ID
      * @param {number} bidAmount - Amount bid (0 to number of cards in round)
+     * @returns {boolean} True if bid registered successfully
      */
     registerBid(playerId, bidAmount) {
       console.log(`Bid registered - Player: ${playerId}, Bid: ${bidAmount}`);
       
+      // Validate player exists
       if (!this.gameState.players.find(p => p.id === playerId)) {
         console.error('Invalid player ID:', playerId);
+        return false;
+      }
+
+      // Validate bid amount is a non-negative integer
+      if (!Number.isInteger(bidAmount) || bidAmount < 0) {
+        console.error('Bid must be a non-negative integer. Received:', bidAmount);
+        return false;
+      }
+
+      // Validate bid is within valid range
+      const maxBid = this.getCardsInRound();
+      if (bidAmount > maxBid) {
+        console.error(`Bid must be <= ${maxBid} for this round. Received:`, bidAmount);
         return false;
       }
 
@@ -130,6 +158,7 @@ window.gameApp = function() {
 
     /**
      * Check if all players have submitted bids
+     * @returns {boolean} True if all bids collected
      */
     checkAllBidsCollected() {
       const bidCount = Object.keys(this.gameState.bids).length;
@@ -148,6 +177,7 @@ window.gameApp = function() {
     /**
      * Proceed to playing phase after all bids collected
      * This can be called manually or automatically
+     * @returns {boolean} True if proceeding successfully
      */
     proceedToPlayingPhase() {
       if (!this.gameState.allBidsCollected) {
@@ -181,20 +211,47 @@ window.gameApp = function() {
      * Register tricks won in current round
      * @param {string} playerId - Player ID
      * @param {number} tricksWon - Number of tricks won
+     * @returns {boolean} True if tricks registered successfully
      */
     registerTricks(playerId, tricksWon) {
       console.log(`Tricks registered - Player: ${playerId}, Tricks: ${tricksWon}`);
+      
+      // Validate player exists
+      if (!this.gameState.players.find(p => p.id === playerId)) {
+        console.error('Invalid player ID:', playerId);
+        return false;
+      }
+
+      // Validate tricks is a non-negative integer
+      if (!Number.isInteger(tricksWon) || tricksWon < 0) {
+        console.error('Tricks won must be a non-negative integer. Received:', tricksWon);
+        return false;
+      }
+
+      // Validate tricks doesn't exceed cards in round
+      const maxTricks = this.getCardsInRound();
+      if (tricksWon > maxTricks) {
+        console.error(`Tricks won cannot exceed ${maxTricks}. Received:`, tricksWon);
+        return false;
+      }
+
       this.gameState.tricks[playerId] = tricksWon;
+      return true;
     },
 
     /**
      * Complete current round and calculate scores
+     * @returns {boolean} True if round completed successfully
      */
     completeRound() {
       console.log('Completing round:', this.gameState.currentRound);
       
-      if (Object.keys(this.gameState.tricks).length !== this.gameState.players.length) {
-        console.error('Not all trick data collected');
+      // Verify all trick data has been collected
+      const tricksCount = Object.keys(this.gameState.tricks).length;
+      const playerCount = this.gameState.players.length;
+      
+      if (tricksCount !== playerCount) {
+        console.error(`Not all trick data collected: ${tricksCount}/${playerCount}`);
         return false;
       }
 
@@ -208,7 +265,8 @@ window.gameApp = function() {
 
     /**
      * Calculate scores for current round
-     * Simple scoring: if bid matches tricks, award points
+     * Scoring: If bid matches tricks won, award 10 + bid points
+     *          Otherwise, award -5 points
      */
     calculateRoundScores() {
       console.log('Calculating round scores');
@@ -221,7 +279,7 @@ window.gameApp = function() {
         let roundScore = 0;
         
         if (bid === tricks) {
-          // Made bid: 10 + (bid amount)
+          // Made bid: 10 + bid amount
           roundScore = 10 + bid;
         } else {
           // Failed bid: -5 points
@@ -273,20 +331,38 @@ window.gameApp = function() {
     },
 
     /**
-     * End the game
+     * Proceed to final scores phase
      */
-    endGame() {
-      console.log('Game ended');
-      this.gameState.gameActive = false;
-      this.gameState.phase = 'gameOver';
-      
-      // Determine winner
-      const winner = this.getWinner();
+    proceedToFinalScores() {
+      console.log('Proceeding to final scores phase');
+      this.gameState.phase = 'finalScores';
       
       this.uiState.transition = true;
       this.uiState.showScoring = false;
       
       setTimeout(() => {
+        this.uiState.showFinalScores = true;
+        this.uiState.transition = false;
+      }, 300);
+    },
+
+    /**
+     * End the game and show final scores
+     */
+    endGame() {
+      console.log('Game ended');
+      this.gameState.gameActive = false;
+      this.gameState.phase = 'finalScores';
+      
+      // Determine winner
+      const winner = this.getWinner();
+      console.log('Game winner:', winner);
+      
+      this.uiState.transition = true;
+      this.uiState.showScoring = false;
+      
+      setTimeout(() => {
+        this.uiState.showFinalScores = true;
         this.uiState.transition = false;
       }, 300);
 
@@ -298,6 +374,7 @@ window.gameApp = function() {
 
     /**
      * Get the game winner
+     * @returns {Object|null} Winner player object or null
      */
     getWinner() {
       let maxScore = -Infinity;
@@ -314,7 +391,21 @@ window.gameApp = function() {
     },
 
     /**
+     * Reset game to initial state
+     */
+    resetGame() {
+      console.log('Resetting game');
+      this.init();
+      this.gameState.players = [];
+      this.gameState.bids = {};
+      this.gameState.tricks = {};
+      this.gameState.scores = {};
+      this.uiState.showFinalScores = false;
+    },
+
+    /**
      * Get current round information
+     * @returns {Object} Round information
      */
     getRoundInfo() {
       return {
@@ -329,22 +420,23 @@ window.gameApp = function() {
 
     /**
      * Get number of cards in current round
-     * Classic game: 13 cards round 1, then 12, 11, ... 1, then 2, 3... 13
+     * Classic 13-round game: starts with 13 cards, decrements to 1, then increments back to 13
+     * Rounds 1-13: 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+     * (For rounds beyond 13, pattern would continue: 2, 3, 4... but game is 13 rounds total)
+     * @returns {number} Number of cards in current round
      */
     getCardsInRound() {
       const round = this.gameState.currentRound;
       const totalRounds = this.gameState.totalRounds;
-      const halfway = Math.ceil(totalRounds / 2);
       
-      if (round <= halfway) {
-        return totalRounds - round + 1;
-      } else {
-        return round - halfway;
-      }
+      // For a 13-round game: round 1 = 13 cards, round 7 = 7 cards, round 13 = 1 card
+      // Formula: cards = totalRounds - round + 1
+      return totalRounds - round + 1;
     },
 
     /**
-     * Get player information
+     * Get player information with current game state
+     * @returns {Array} Array of player objects with current game data
      */
     getPlayers() {
       return this.gameState.players.map(player => ({
@@ -356,7 +448,22 @@ window.gameApp = function() {
     },
 
     /**
-     * Event handling
+     * Get players sorted by final score (descending)
+     * @returns {Array} Array of player objects sorted by score
+     */
+    getPlayersFinalScores() {
+      return this.gameState.players
+        .map(player => ({
+          ...player,
+          totalScore: this.gameState.scores[player.id] || 0
+        }))
+        .sort((a, b) => b.totalScore - a.totalScore);
+    },
+
+    /**
+     * Event handling - emit custom events for other components
+     * @param {string} eventName - Name of event to emit
+     * @param {Object} data - Data to attach to event
      */
     emitEvent(eventName, data) {
       const event = new CustomEvent('gameApp:' + eventName, {
