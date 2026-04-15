@@ -1,207 +1,188 @@
 /**
- * Trick Entry Form Controller
- * Manages player trick entry with validation
+ * Trick Entry Form Component
+ * Manages player trick input, validation, and real-time remaining tricks calculation
  */
 
-/**
- * Alpine.js component for trick entry form
- */
 function trickEntryForm() {
   return {
+    // Reactive state
+    players: [
+      { id: 1, name: 'Player 1', tricks: null },
+      { id: 2, name: 'Player 2', tricks: null },
+      { id: 3, name: 'Player 3', tricks: null },
+      { id: 4, name: 'Player 4', tricks: null },
+    ],
     currentRound: 1,
-    roundNumber: 1,
-    trickEntries: {},
+    tricksAvailableThisRound: 13, // Will be set dynamically
     validationErrors: [],
-    numPlayers: 0,
 
     /**
-     * Initialize the trick entry form for a given round
-     * @param {number} roundNum - The current round number
-     * @param {number} playerCount - Number of players in the game
-     */
-    init(roundNum, playerCount) {
-      this.currentRound = roundNum;
-      this.roundNumber = roundNum;
-      this.numPlayers = playerCount;
-      this.trickEntries = {};
-      this.validationErrors = [];
-      
-      // Initialize trick entries for each player
-      for (let i = 0; i < playerCount; i++) {
-        this.$watch(`trickEntries.player${i}`, () => {
-          this.validateForm();
-        });
-      }
-      
-      this.renderTrickInputs();
-    },
-
-    /**
-     * Render trick input fields for each player
-     */
-    renderTrickInputs() {
-      const container = document.getElementById('trick-inputs');
-      if (!container) return;
-      
-      container.innerHTML = '';
-      
-      for (let i = 0; i < this.numPlayers; i++) {
-        const playerDiv = document.createElement('div');
-        playerDiv.style.marginBottom = '1rem';
-        
-        const label = document.createElement('label');
-        label.htmlFor = `player-${i}-tricks`;
-        label.style.display = 'block';
-        label.style.marginBottom = '0.5rem';
-        label.style.fontWeight = 'bold';
-        label.textContent = `Player ${i + 1} Tricks:`;
-        
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.id = `player-${i}-tricks`;
-        input.min = '0';
-        input.max = this.roundNumber;
-        input.style.padding = '0.5rem';
-        input.style.fontSize = '1rem';
-        input.style.width = '100px';
-        input.value = this.trickEntries[`player${i}`] || '';
-        
-        input.addEventListener('input', (e) => {
-          this.trickEntries[`player${i}`] = parseInt(e.target.value) || 0;
-          this.validateForm();
-        });
-        
-        playerDiv.appendChild(label);
-        playerDiv.appendChild(input);
-        container.appendChild(playerDiv);
-      }
-    },
-
-    /**
-     * Calculate remaining tricks that can be entered
-     * @returns {number} Remaining tricks available
+     * Getter for remaining tricks calculation
+     * Subtracts all player trick entries from available tricks
      */
     get remainingTricks() {
-      let totalEntered = 0;
-      for (let i = 0; i < this.numPlayers; i++) {
-        totalEntered += this.trickEntries[`player${i}`] || 0;
-      }
-      // Prevent negative values
-      return Math.max(0, this.roundNumber - totalEntered);
+      const totalTricksTaken = this.players.reduce((sum, player) => {
+        const tricks = parseInt(player.tricks) || 0;
+        return sum + (tricks >= 0 ? tricks : 0);
+      }, 0);
+      return this.tricksAvailableThisRound - totalTricksTaken;
     },
 
     /**
-     * Validate individual trick entry doesn't exceed remaining tricks
-     * @param {number} playerIndex - Index of the player
-     * @param {number} tricks - Number of tricks entered
-     * @returns {boolean} True if valid
-     */
-    validateTrickEntry(playerIndex, tricks) {
-      if (tricks < 0) return false;
-      
-      // Calculate remaining tricks excluding this player's current entry
-      let totalEntered = 0;
-      for (let i = 0; i < this.numPlayers; i++) {
-        if (i !== playerIndex) {
-          totalEntered += this.trickEntries[`player${i}`] || 0;
-        }
-      }
-      
-      // Check if this player's entry would exceed the round number
-      if (totalEntered + tricks > this.roundNumber) {
-        return false;
-      }
-      
-      return true;
-    },
-
-    /**
-     * Validate that total tricks equals round number
-     * @returns {boolean} True if total equals round number
-     */
-    validateTotalTricks() {
-      let total = 0;
-      for (let i = 0; i < this.numPlayers; i++) {
-        total += this.trickEntries[`player${i}`] || 0;
-      }
-      return total === this.roundNumber;
-    },
-
-    /**
-     * Show validation errors
-     */
-    showValidationErrors() {
-      this.validationErrors = [];
-      
-      // Check individual entries
-      for (let i = 0; i < this.numPlayers; i++) {
-        const tricks = this.trickEntries[`player${i}`] || 0;
-        
-        if (tricks < 0) {
-          this.validationErrors.push(`Player ${i + 1}: Tricks cannot be negative`);
-        }
-        
-        if (!this.validateTrickEntry(i, tricks)) {
-          this.validationErrors.push(`Player ${i + 1}: Entry exceeds remaining tricks available`);
-        }
-      }
-      
-      // Check total
-      const total = Object.values(this.trickEntries).reduce((sum, val) => sum + (val || 0), 0);
-      if (total !== this.roundNumber) {
-        this.validationErrors.push(`Total tricks (${total}) must equal round number (${this.roundNumber})`);
-      }
-    },
-
-    /**
-     * Validate the entire form
-     */
-    validateForm() {
-      this.showValidationErrors();
-    },
-
-    /**
-     * Check if form is valid
-     * @returns {boolean} True if form is valid
+     * Computed property for form validation
+     * Form is valid when:
+     * - All players have entered a value
+     * - All values are non-negative
+     * - Total tricks don't exceed available tricks
+     * - No validation errors exist
      */
     get isFormValid() {
-      if (this.validationErrors.length > 0) return false;
-      
-      // All players must have entries
-      for (let i = 0; i < this.numPlayers; i++) {
-        if (!(this.trickEntries[`player${i}`] >= 0)) {
-          return false;
-        }
+      // Check if all players have entered a value
+      const allPlayersHaveInput = this.players.every(
+        (player) => player.tricks !== null && player.tricks !== ''
+      );
+
+      if (!allPlayersHaveInput) {
+        return false;
       }
-      
-      return this.validateTotalTricks();
+
+      // Check if all values are non-negative numbers
+      const allValidNumbers = this.players.every((player) => {
+        const tricks = parseInt(player.tricks);
+        return !isNaN(tricks) && tricks >= 0;
+      });
+
+      if (!allValidNumbers) {
+        return false;
+      }
+
+      // Check if total doesn't exceed available tricks
+      return this.remainingTricks >= 0 && this.validationErrors.length === 0;
     },
 
     /**
-     * Submit trick entry
+     * Initialize form for a new round
+     * Called when transitioning to trick entry phase
      */
-    submitTrickEntry() {
-      this.validateForm();
-      
-      if (!this.isFormValid) {
-        return;
+    initializeRound(roundNumber, tricksAvailable, playerList) {
+      this.currentRound = roundNumber;
+      this.tricksAvailableThisRound = tricksAvailable;
+
+      // Reset players if custom list provided
+      if (playerList && Array.isArray(playerList)) {
+        this.players = playerList.map((player, index) => ({
+          id: player.id || index + 1,
+          name: player.name || `Player ${index + 1}`,
+          tricks: null,
+        }));
+      } else {
+        // Reset tricks for current players
+        this.players.forEach((player) => {
+          player.tricks = null;
+        });
       }
-      
-      // Dispatch custom event with trick data
-      const event = new CustomEvent('tricksSubmitted', {
-        detail: {
-          round: this.currentRound,
-          tricks: this.trickEntries
+
+      this.validationErrors = [];
+    },
+
+    /**
+     * Validate trick entry
+     * Checks for logical errors in the trick entry
+     */
+    validateTrickEntry() {
+      this.validationErrors = [];
+
+      // Check for missing values
+      this.players.forEach((player) => {
+        if (player.tricks === null || player.tricks === '') {
+          this.validationErrors.push(
+            `${player.name} must enter the number of tricks taken.`
+          );
         }
       });
-      document.dispatchEvent(event);
-    }
-  };
-}
 
-/**
- * Export for testing and external use
- */
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = trickEntryForm;
+      // Check for invalid numbers
+      this.players.forEach((player) => {
+        if (player.tricks !== null && player.tricks !== '') {
+          const tricks = parseInt(player.tricks);
+          if (isNaN(tricks)) {
+            this.validationErrors.push(
+              `${player.name}'s trick count must be a valid number.`
+            );
+          } else if (tricks < 0) {
+            this.validationErrors.push(
+              `${player.name}'s trick count cannot be negative.`
+            );
+          }
+        }
+      });
+
+      // Check if total exceeds available tricks
+      if (this.remainingTricks < 0) {
+        this.validationErrors.push(
+          `Total tricks exceed available tricks (${this.tricksAvailableThisRound}). Reduce entries by ${Math.abs(this.remainingTricks)}.`
+        );
+      }
+
+      return this.validationErrors.length === 0;
+    },
+
+    /**
+     * Submit trick entry form
+     * Validates and processes trick entries
+     */
+    submitTrickEntry() {
+      // Validate before submission
+      if (!this.validateTrickEntry()) {
+        console.warn('Trick entry validation failed:', this.validationErrors);
+        return;
+      }
+
+      // Build submission data
+      const trickData = {
+        round: this.currentRound,
+        tricks: this.players.map((player) => ({
+          playerId: player.id,
+          playerName: player.name,
+          tricksTaken: parseInt(player.tricks),
+        })),
+        timestamp: new Date().toISOString(),
+      };
+
+      // Dispatch custom event for parent component to handle
+      const event = new CustomEvent('tricksSubmitted', {
+        detail: trickData,
+        bubbles: true,
+        cancelable: false,
+      });
+      document.getElementById('trick-entry-form').dispatchEvent(event);
+
+      // Reset form for next round
+      this.resetForm();
+    },
+
+    /**
+     * Reset form to initial state
+     */
+    resetForm() {
+      this.players.forEach((player) => {
+        player.tricks = null;
+      });
+      this.validationErrors = [];
+    },
+
+    /**
+     * Show the form
+     */
+    showForm() {
+      document.getElementById('trick-entry-form').style.display = 'block';
+    },
+
+    /**
+     * Hide the form
+     */
+    hideForm() {
+      document.getElementById('trick-entry-form').style.display = 'none';
+    },
+  };
 }
