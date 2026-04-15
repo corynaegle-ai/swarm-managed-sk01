@@ -9,35 +9,47 @@
 </head>
 <body>
     <div id="app">
-        <div class="setup-container">
-            <h1>Player Setup</h1>
-            <p class="player-count">Players: <span id="player-count">0</span>/8</p>
+        <div class="player-setup-container">
+            <h1>Game Setup</h1>
+            <p>Enter player names to begin the game</p>
             
-            <form id="player-form" class="player-form">
-                <div class="form-group">
-                    <label for="player-name">Player Name:</label>
-                    <input 
-                        type="text" 
-                        id="player-name" 
-                        name="player-name" 
-                        placeholder="Enter player name"
-                        required
-                        maxlength="50"
-                    >
-                    <span id="error-message" class="error-message"></span>
-                </div>
-                
-                <button type="button" id="add-player-btn" class="btn btn-primary">Add Player</button>
-            </form>
-            
-            <div class="players-section">
-                <h2>Players</h2>
-                <ol id="players-list" class="players-list">
-                    <!-- Players will be added here dynamically -->
-                </ol>
+            <div class="setup-form-section">
+                <form id="playerForm" class="player-form">
+                    <div class="form-group">
+                        <label for="playerNameInput">Player Name:</label>
+                        <input 
+                            type="text" 
+                            id="playerNameInput" 
+                            class="player-input" 
+                            placeholder="Enter player name"
+                            autocomplete="off"
+                        >
+                        <span id="inputError" class="error-message"></span>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="button" id="addPlayerBtn" class="btn btn-add">Add Player</button>
+                    </div>
+                </form>
             </div>
             
-            <button type="button" id="start-game-btn" class="btn btn-success" disabled>Start Game</button>
+            <div class="player-count-section">
+                <p class="player-count">Players: <span id="playerCount">0</span>/8</p>
+            </div>
+            
+            <div class="players-list-section">
+                <h2>Players Added</h2>
+                <ul id="playersList" class="players-list">
+                    <!-- Players will be added here dynamically -->
+                </ul>
+            </div>
+            
+            <div class="action-buttons-section">
+                <button type="button" id="startGameBtn" class="btn btn-primary" disabled>
+                    Start Game
+                </button>
+                <button type="button" id="resetBtn" class="btn btn-secondary">Reset</button>
+            </div>
         </div>
     </div>
     
