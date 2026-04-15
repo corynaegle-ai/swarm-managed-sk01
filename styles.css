@@ -1,0 +1,877 @@
+/* ========================================
+   PIRATE-THEMED VANILLA JS APP STYLES
+   ======================================== */
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Crimson+Text:wght@400;600&family=Playfair+Display:wght@700;900&display=swap');
+
+/* ========================================
+   1. CSS CUSTOM PROPERTIES - COLOR PALETTE
+   ======================================== */
+:root {
+  /* Pirate Color Palette */
+  --pirate-navy: #0a1929;
+  --pirate-navy-light: #1a3a52;
+  --pirate-gold: #d4af37;
+  --pirate-gold-light: #f4d04d;
+  --pirate-brown: #5c4033;
+  --pirate-brown-dark: #3e2723;
+  --pirate-cream: #f5e6d3;
+  --pirate-red: #8b0000;
+  --pirate-red-light: #dc143c;
+  
+  /* Functional Colors */
+  --pirate-bg-primary: #0a1929;
+  --pirate-bg-secondary: #1a3a52;
+  --pirate-text-primary: #f5e6d3;
+  --pirate-text-secondary: #d4af37;
+  --pirate-border: #5c4033;
+  --pirate-shadow: rgba(0, 0, 0, 0.4);
+  
+  /* Typography */
+  --font-heading: 'Pirata One', cursive;
+  --font-body: 'Crimson Text', 'Georgia', serif;
+  --font-display: 'Playfair Display', serif;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+}
+
+/* ========================================
+   2. GLOBAL STYLES
+   ======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: linear-gradient(135deg, var(--pirate-navy) 0%, var(--pirate-navy-light) 50%, var(--pirate-brown-dark) 100%);
+  color: var(--pirate-text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  min-height: 100vh;
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* Water/Ocean texture background effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(212, 175, 55, 0.03) 2px,
+      rgba(212, 175, 55, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 4px,
+      rgba(212, 175, 55, 0.02) 4px,
+      rgba(212, 175, 55, 0.02) 8px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ========================================
+   3. TYPOGRAPHY STYLES
+   ======================================== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--pirate-gold);
+  font-weight: 400;
+  text-shadow: 2px 2px 4px var(--pirate-shadow);
+  letter-spacing: 0.05em;
+}
+
+h1 {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  /* Skull decoration effect */
+  position: relative;
+  padding-bottom: var(--spacing-lg);
+}
+
+/* Skull emoji decoration for h1 */
+h1::before {
+  content: '☠';
+  display: inline-block;
+  margin-right: var(--spacing-md);
+  font-size: 1.2em;
+  vertical-align: middle;
+  animation: bob 3s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-lg);
+  color: var(--pirate-gold-light);
+}
+
+h3 {
+  font-size: 1.75rem;
+  margin-bottom: var(--spacing-md);
+}
+
+h4, h5, h6 {
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-md);
+}
+
+p {
+  margin-bottom: var(--spacing-md);
+  letter-spacing: 0.02em;
+}
+
+strong {
+  color: var(--pirate-gold-light);
+  font-weight: 600;
+}
+
+a {
+  color: var(--pirate-gold);
+  text-decoration: none;
+  transition: color var(--transition-fast), text-shadow var(--transition-fast);
+  border-bottom: 1px solid transparent;
+}
+
+a:hover {
+  color: var(--pirate-gold-light);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+/* ========================================
+   4. BUTTON STYLES
+   ======================================== */
+.btn-pirate,
+.btn-treasure,
+button {
+  font-family: var(--font-body);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid var(--pirate-gold);
+  background-color: var(--pirate-brown);
+  color: var(--pirate-gold);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border-radius: var(--radius-md);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 8px var(--pirate-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pirate button base style */
+.btn-pirate {
+  background-color: var(--pirate-brown);
+  border-color: var(--pirate-gold);
+  color: var(--pirate-gold);
+}
+
+.btn-pirate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left var(--transition-normal);
+}
+
+.btn-pirate:hover::before {
+  left: 100%;
+}
+
+.btn-pirate:hover {
+  background-color: var(--pirate-gold);
+  color: var(--pirate-navy);
+  box-shadow: 0 0 12px var(--pirate-gold);
+  transform: translateY(-2px);
+}
+
+.btn-pirate:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px var(--pirate-shadow);
+}
+
+.btn-pirate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Treasure button style */
+.btn-treasure {
+  background: linear-gradient(135deg, var(--pirate-gold) 0%, var(--pirate-gold-light) 100%);
+  border-color: var(--pirate-gold-light);
+  color: var(--pirate-navy);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.btn-treasure:hover {
+  background: linear-gradient(135deg, var(--pirate-gold-light) 0%, var(--pirate-gold) 100%);
+  box-shadow: 0 0 16px var(--pirate-gold), inset 0 0 8px rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.btn-treasure:active {
+  transform: scale(0.98);
+}
+
+/* Generic button hover state */
+button:hover:not(:disabled) {
+  background-color: var(--pirate-gold);
+  color: var(--pirate-navy);
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   5. INPUT STYLES
+   ======================================== */
+input,
+textarea,
+select {
+  font-family: var(--font-body);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--pirate-border);
+  background-color: var(--pirate-navy-light);
+  color: var(--pirate-text-primary);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+  line-height: 1.6;
+}
+
+.input-pirate {
+  border: 2px solid var(--pirate-gold);
+  background: linear-gradient(to bottom, var(--pirate-navy-light), var(--pirate-navy));
+  color: var(--pirate-text-primary);
+  box-shadow: inset 0 2px 4px var(--pirate-shadow);
+}
+
+.input-pirate::placeholder {
+  color: rgba(212, 175, 55, 0.5);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--pirate-gold);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3), inset 0 0 4px rgba(212, 175, 55, 0.1);
+}
+
+.input-pirate:focus {
+  background: linear-gradient(to bottom, var(--pirate-navy), var(--pirate-navy-light));
+  box-shadow: inset 0 2px 4px var(--pirate-shadow), 0 0 12px rgba(212, 175, 55, 0.4);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: var(--pirate-gold);
+}
+
+label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--pirate-gold);
+}
+
+/* ========================================
+   6. CARD COMPONENT STYLES
+   ======================================== */
+.card-pirate {
+  background: linear-gradient(135deg, var(--pirate-navy-light) 0%, var(--pirate-navy) 100%);
+  border: 2px solid var(--pirate-gold);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 8px 16px var(--pirate-shadow);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative corner elements */
+.card-pirate::before,
+.card-pirate::after {
+  content: '🏴';
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.15;
+  transition: opacity var(--transition-normal);
+}
+
+.card-pirate::before {
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+}
+
+.card-pirate::after {
+  bottom: var(--spacing-md);
+  left: var(--spacing-md);
+  transform: rotate(180deg);
+}
+
+.card-pirate:hover {
+  border-color: var(--pirate-gold-light);
+  box-shadow: 0 12px 24px var(--pirate-shadow), 0 0 16px rgba(212, 175, 55, 0.2);
+  transform: translateY(-4px);
+}
+
+.card-pirate:hover::before,
+.card-pirate:hover::after {
+  opacity: 0.25;
+}
+
+.card-pirate h3,
+.card-pirate h4 {
+  color: var(--pirate-gold-light);
+}
+
+.card-pirate p {
+  color: var(--pirate-text-primary);
+}
+
+/* ========================================
+   7. NAVIGATION STYLES
+   ======================================== */
+.nav-pirate {
+  background: linear-gradient(90deg, var(--pirate-navy) 0%, var(--pirate-navy-light) 50%, var(--pirate-navy) 100%);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid var(--pirate-gold);
+  box-shadow: 0 4px 8px var(--pirate-shadow);
+  position: relative;
+  z-index: 10;
+}
+
+.nav-pirate::before {
+  content: '⚓';
+  position: absolute;
+  left: var(--spacing-md);
+  font-size: 1.5rem;
+  opacity: 0.4;
+}
+
+.nav-pirate::after {
+  content: '⚓';
+  position: absolute;
+  right: var(--spacing-md);
+  font-size: 1.5rem;
+  opacity: 0.4;
+}
+
+.nav-pirate ul {
+  list-style: none;
+  display: flex;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.nav-pirate a {
+  color: var(--pirate-gold);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.nav-pirate a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--pirate-gold);
+  transition: width var(--transition-normal);
+}
+
+.nav-pirate a:hover {
+  color: var(--pirate-gold-light);
+  background-color: rgba(212, 175, 55, 0.1);
+}
+
+.nav-pirate a:hover::after {
+  width: 100%;
+}
+
+.nav-pirate a.active {
+  background-color: var(--pirate-gold);
+  color: var(--pirate-navy);
+  box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+}
+
+/* ========================================
+   8. CONTAINER & LAYOUT STYLES
+   ======================================== */
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+  position: relative;
+  z-index: 2;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Responsive container */
+@media (min-width: 640px) {
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--spacing-xl);
+  }
+}
+
+.grid {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+/* Responsive grid - mobile first */
+.grid-auto {
+  grid-template-columns: 1fr;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .grid-auto {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .grid-auto {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ========================================
+   9. PIRATE IMAGERY & PSEUDO-ELEMENTS
+   ======================================== */
+
+/* Skull and crossbones accent */
+.skull-accent {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.skull-accent::before {
+  content: '☠';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  opacity: 0.6;
+}
+
+/* Ship wheel accent */
+.ship-accent {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.ship-accent::before {
+  content: '⚙';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  opacity: 0.6;
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Treasure chest accent */
+.treasure-accent {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.treasure-accent::before {
+  content: '💰';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  opacity: 0.6;
+}
+
+/* Wave decoration */
+.wave-decoration {
+  position: relative;
+  padding-bottom: var(--spacing-lg);
+}
+
+.wave-decoration::after {
+  content: '≈ ≈ ≈';
+  display: block;
+  color: var(--pirate-gold);
+  opacity: 0.3;
+  letter-spacing: 0.2em;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+/* ========================================
+   10. UTILITY CLASSES
+   ======================================== */
+.text-gold {
+  color: var(--pirate-gold);
+}
+
+.text-gold-light {
+  color: var(--pirate-gold-light);
+}
+
+.text-navy {
+  color: var(--pirate-navy);
+}
+
+.text-cream {
+  color: var(--pirate-cream);
+}
+
+.bg-navy {
+  background-color: var(--pirate-navy);
+}
+
+.bg-brown {
+  background-color: var(--pirate-brown);
+}
+
+.border-gold {
+  border-color: var(--pirate-gold);
+}
+
+.shadow-pirate {
+  box-shadow: 0 8px 16px var(--pirate-shadow);
+}
+
+.rounded-pirate {
+  border-radius: var(--radius-lg);
+}
+
+/* Spacing utilities */
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--spacing-xs); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-3 { margin-top: var(--spacing-md); }
+.mt-4 { margin-top: var(--spacing-lg); }
+.mt-6 { margin-top: var(--spacing-xl); }
+.mt-8 { margin-top: var(--spacing-2xl); }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--spacing-xs); }
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-3 { margin-bottom: var(--spacing-md); }
+.mb-4 { margin-bottom: var(--spacing-lg); }
+.mb-6 { margin-bottom: var(--spacing-xl); }
+.mb-8 { margin-bottom: var(--spacing-2xl); }
+
+.p-2 { padding: var(--spacing-sm); }
+.p-3 { padding: var(--spacing-md); }
+.p-4 { padding: var(--spacing-lg); }
+.p-6 { padding: var(--spacing-xl); }
+
+/* Display utilities */
+.hidden {
+  display: none !important;
+}
+
+.block {
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.grid {
+  display: grid;
+}
+
+/* Text alignment */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* ========================================
+   11. FORM STYLES
+   ======================================== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+form > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .form-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ========================================
+   12. RESPONSIVE DESIGN - BREAKPOINTS
+   ======================================== */
+
+/* Mobile (default) */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+  
+  h2 {
+    font-size: 1.75rem;
+  }
+  
+  .nav-pirate {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .nav-pirate ul {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    width: 100%;
+  }
+  
+  #app {
+    padding: var(--spacing-lg);
+  }
+}
+
+/* Tablet (640px and up) */
+@media (min-width: 640px) {
+  h1 {
+    font-size: 3rem;
+  }
+  
+  h2 {
+    font-size: 2rem;
+  }
+}
+
+/* Large screens (1024px and up) */
+@media (min-width: 1024px) {
+  h1 {
+    font-size: 4rem;
+  }
+  
+  h2 {
+    font-size: 2.5rem;
+  }
+  
+  #app {
+    padding: var(--spacing-xl) var(--spacing-2xl);
+  }
+}
+
+/* Extra large screens (1280px and up) */
+@media (min-width: 1280px) {
+  #app {
+    padding: var(--spacing-2xl);
+  }
+}
+
+/* ========================================
+   13. ACCESSIBILITY & STATES
+   ======================================== */
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--pirate-gold);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  h1::before {
+    animation: none;
+  }
+  
+  .ship-accent::before {
+    animation: none;
+  }
+}
+
+/* Dark mode (already implemented as default pirate theme) */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, var(--pirate-navy) 0%, var(--pirate-navy-light) 50%, var(--pirate-brown-dark) 100%);
+  }
+}
+
+/* ========================================
+   14. ANIMATION STATES
+   ======================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-normal) ease-in-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft var(--transition-normal) ease-in-out;
+}
+
+/* ========================================
+   15. SCROLLBAR STYLING
+   ======================================== */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--pirate-navy);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pirate-gold);
+  border-radius: var(--radius-md);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pirate-gold-light);
+}
+
+/* Firefox */
+* {
+  scrollbar-color: var(--pirate-gold) var(--pirate-navy);
+  scrollbar-width: thin;
+}
