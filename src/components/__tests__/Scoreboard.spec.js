@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import Scoreboard from '../Scoreboard.vue';
-import { scoreboardService } from '@/services/ScoreboardService';
+import { scoreboardService } from '../../services/ScoreboardService';
 
 describe('Scoreboard.vue', () => {
   let wrapper;

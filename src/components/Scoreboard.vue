@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { scoreboardService } from '@/services/ScoreboardService';
+import { scoreboardService } from '../services/ScoreboardService';
 
 export default {
   name: 'Scoreboard',
