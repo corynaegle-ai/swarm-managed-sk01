@@ -1,36 +1,16 @@
-/**
- * Main application entry point
- * Initializes the vanilla JS app with state management and event handling
- */
+// Application initialization and global state setup
 
-(function() {
-    'use strict';
+// Initialize global gameState BEFORE Alpine.js initializes
+const gameState = new GameState();
 
-    // Application state
-    const appState = {
-        initialized: false,
-        version: '1.0.0'
-    };
+// Application startup
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Application initialized');
+  console.log('GameState instance created and available globally');
+});
 
-    /**
-     * Initialize the application
-     */
-    function init() {
-        try {
-            console.log('Initializing Vanilla JS App v' + appState.version);
-            appState.initialized = true;
-            console.log('Application initialized successfully');
-        } catch (error) {
-            console.error('Failed to initialize application:', error);
-        }
-    }
-
-    /**
-     * Run initialization when DOM is ready
-     */
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
+// Listen for trick entry submission
+document.addEventListener('trickEntrySubmit', function(event) {
+  console.log('Trick entry submitted:', event.detail);
+  // Handle trick entry submission logic here
+});

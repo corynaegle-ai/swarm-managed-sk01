@@ -1,20 +1,23 @@
-// Alpine.js component for trick entry form
+// Trick entry form management with Alpine.js
 
 function trickEntryForm() {
   return {
+    gameState: null,
     players: [],
     currentRound: 1,
     validationErrors: [],
     remainingTricks: 0,
     isFormValid: false,
-    gameState: null,
 
     init() {
-      // Initialize with game state if available
-      if (typeof gameState !== 'undefined') {
+      // Initialize reference to global gameState
+      if (typeof gameState !== 'undefined' && gameState !== null) {
         this.gameState = gameState;
-        this.players = gameState.players;
-        this.currentRound = gameState.currentRound;
+        this.players = this.gameState.players;
+        this.currentRound = this.gameState.currentRound;
+        this.updateRemainingTricks();
+      } else {
+        console.error('Global gameState not initialized');
       }
     },
 
@@ -26,40 +29,79 @@ function trickEntryForm() {
     },
 
     updateBonusPoints(playerId, value) {
-      // Parse the string value to a number
-      const amount = parseInt(value, 10);
-
-      // Validate the input
-      if (isNaN(amount)) {
-        console.error('Invalid bonus points: not a number');
+      if (!this.gameState) {
+        console.error('gameState not initialized');
         return;
       }
 
-      if (amount < 0) {
-        console.error('Bonus points cannot be negative');
-        return;
-      }
+      try {
+        // Convert empty string to 0, otherwise parse as integer
+        let amount = value === '' ? 0 : parseInt(value, 10);
 
-      // Update the player's bonus points directly
-      const player = this.gameState.getPlayer(playerId);
-      if (player) {
-        player.bonusPoints = amount;
+        // Validate is a number
+        if (isNaN(amount)) {
+          console.error('Invalid bonus amount');
+          return;
+        }
+
+        // Use the public API with validation
+        this.gameState.setBonusPoints(playerId, amount);
+
+        // Trigger reactivity update
+        this.$nextTick(() => {
+          this.validateForm();
+        });
+      } catch (error) {
+        console.error('Error setting bonus points:', error.message);
       }
     },
 
-    submitTrickEntry() {
+    updateRemainingTricks() {
+      // Placeholder - implement based on game rules
+      // Typically remaining tricks = total tricks - tricks bid
+      this.remainingTricks = 0;
+    },
+
+    validateForm() {
       this.validationErrors = [];
+      this.isFormValid = true;
 
-      // Validate all inputs before submission
-      if (this.gameState) {
-        this.gameState.calculateAllScores();
+      // Validate all bids are set
+      if (this.players.some(p => p.bid === 0 || p.bid === null)) {
+        this.validationErrors.push('All players must have a bid');
+        this.isFormValid = false;
       }
 
-      // If no validation errors, form is valid
-      if (this.validationErrors.length === 0) {
-        console.log('Form submitted successfully');
-        // Form submission logic here
+      // Validate bonus points are non-negative numbers
+      for (const player of this.players) {
+        if (player.bonusPoints < 0) {
+          this.validationErrors.push(`${player.name} has negative bonus points`);
+          this.isFormValid = false;
+        }
       }
+
+      return this.isFormValid;
+    },
+
+    submitTrickEntry() {
+      if (!this.validateForm()) {
+        return;
+      }
+
+      // Dispatch custom event for parent to handle submission
+      const event = new CustomEvent('trickEntrySubmit', {
+        detail: {
+          round: this.currentRound,
+          players: this.players.map(p => ({
+            id: p.id,
+            name: p.name,
+            bid: p.bid,
+            tricksWon: p.tricksWon,
+            bonusPoints: p.bonusPoints
+          }))
+        }
+      });
+      document.dispatchEvent(event);
     }
   };
 }

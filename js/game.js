@@ -5,17 +5,19 @@ class GameState {
     this.players = [];
     this.currentRound = 1;
     this.gameActive = false;
+    this.nextPlayerId = 1;
   }
 
   addPlayer(name) {
     const player = {
-      id: this.players.length + 1,
+      id: this.nextPlayerId,
       name: name,
       bid: 0,
       tricksWon: 0,
       bonusPoints: 0,
       score: 0
     };
+    this.nextPlayerId += 1;
     this.players.push(player);
     return player;
   }
@@ -25,15 +27,17 @@ class GameState {
   }
 
   setBonusPoints(playerId, amount) {
-    // Validate input
+    // Validate input is a number (handle NaN case)
     if (typeof amount !== 'number' || isNaN(amount)) {
       throw new Error('Bonus amount must be a valid number');
     }
 
+    // Validate non-negative
     if (amount < 0) {
       throw new Error('Bonus points cannot be negative');
     }
 
+    // Validate player exists
     const player = this.getPlayer(playerId);
     if (!player) {
       throw new Error(`Player with ID ${playerId} not found`);
