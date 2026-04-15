@@ -1,0 +1,208 @@
+.trick-entry-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.trick-entry-header {
+  margin-bottom: 30px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 15px;
+}
+
+.trick-entry-header h2 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.tricks-counter {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  font-size: 16px;
+}
+
+.total-label,
+.remaining-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.total-value {
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: #e8f4f8;
+  font-weight: bold;
+  color: #0066cc;
+}
+
+.total-value.valid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.total-value.invalid {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.remaining-value {
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: #fff3cd;
+  font-weight: bold;
+  color: #856404;
+}
+
+.remaining-value.complete {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.trick-entry-form {
+  margin-bottom: 20px;
+}
+
+.trick-entry-row {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trick-input {
+  flex: 1;
+  max-width: 100px;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+}
+
+.trick-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.trick-input.error {
+  border-color: #dc3545;
+  background-color: #ffe6e6;
+}
+
+.trick-input.error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+.max-tricks {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.validation-summary {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+  color: #721c24;
+}
+
+.validation-summary h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.validation-summary ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.validation-summary li {
+  margin-bottom: 5px;
+}
+
+.warning-message {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  color: #856404;
+  font-weight: 500;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.submit-button:active:not(:disabled) {
+  background-color: #003d82;
+}
+
+.submit-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .trick-entry-container {
+    padding: 15px;
+  }
+
+  .tricks-counter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .input-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .trick-input {
+    width: 100%;
+    max-width: none;
+  }
+}
