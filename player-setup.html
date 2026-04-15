@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Setup - Vanilla JS App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/player-setup.css">
+</head>
+<body>
+    <div id="app">
+        <div class="player-setup-container">
+            <h1>Game Setup</h1>
+            <p class="subtitle">Add 2-8 players to start the game</p>
+            
+            <div class="setup-form-section">
+                <form id="playerForm" class="player-form">
+                    <div class="form-group">
+                        <label for="playerNameInput">Player Name:</label>
+                        <input 
+                            type="text" 
+                            id="playerNameInput" 
+                            class="player-input" 
+                            placeholder="Enter player name"
+                            maxlength="50"
+                            autocomplete="off"
+                        />
+                    </div>
+                    <button type="button" id="addPlayerBtn" class="btn btn-add">Add Player</button>
+                </form>
+                <div class="player-count">
+                    <span id="playerCount">0</span> / 8 players
+                </div>
+            </div>
+
+            <div class="player-list-section">
+                <h2>Players:</h2>
+                <ul id="playersList" class="players-list">
+                    <!-- Players will be added here dynamically -->
+                </ul>
+                <p id="emptyPlayersMessage" class="empty-message">No players added yet</p>
+            </div>
+
+            <div class="action-buttons">
+                <button id="startGameBtn" class="btn btn-primary" disabled>Start Game</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Player setup form logic
+        (() => {
+            const playerNameInput = document.getElementById('playerNameInput');
+            const addPlayerBtn = document.getElementById('addPlayerBtn');
+            const playersList = document.getElementById('playersList');
+            const playerCountDisplay = document.getElementById('playerCount');
+            const startGameBtn = document.getElementById('startGameBtn');
+            const emptyPlayersMessage = document.getElementById('emptyPlayersMessage');
+            const playerForm = document.getElementById('playerForm');
+
+            let players = [];
+            const MAX_PLAYERS = 8;
+            const MIN_PLAYERS = 2;
+
+            /**
+             * Update UI elements based on current player list state
+             */
+            function updateUI() {
+                playerCountDisplay.textContent = players.length;
+                
+                // Toggle empty message
+                if (players.length === 0) {
+                    emptyPlayersMessage.style.display = 'block';
+                    playersList.innerHTML = '';
+                } else {
+                    emptyPlayersMessage.style.display = 'none';
+                    renderPlayersList();
+                }
+                
+                // Disable add button when max players reached
+                addPlayerBtn.disabled = players.length >= MAX_PLAYERS;
+                
+                // Enable start button only when 2-8 players
+                startGameBtn.disabled = players.length < MIN_PLAYERS;
+                
+                // Clear input field
+                playerNameInput.value = '';
+                playerNameInput.focus();
+            }
+
+            /**
+             * Render the players list
+             */
+            function renderPlayersList() {
+                playersList.innerHTML = players
+                    .map((player, index) => `
+                        <li class="player-item">
+                            <span class="player-name">${escapeHtml(player)}</span>
+                            <button type="button" class="btn btn-remove" data-index="${index}">Remove</button>
+                        </li>
+                    `)
+                    .join('');
+                
+                // Attach event listeners to remove buttons
+                document.querySelectorAll('.btn-remove').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const index = parseInt(btn.getAttribute('data-index'));
+                        removePlayer(index);
+                    });
+                });
+            }
+
+            /**
+             * Remove a player by index
+             */
+            function removePlayer(index) {
+                if (index >= 0 && index < players.length) {
+                    players.splice(index, 1);
+                    updateUI();
+                }
+            }
+
+            /**
+             * Validate and add a player
+             */
+            function addPlayer() {
+                const playerName = playerNameInput.value.trim();
+                
+                // Validation: empty name
+                if (playerName === '') {
+                    alert('Please enter a player name');
+                    playerNameInput.focus();
+                    return;
+                }
+                
+                // Validation: max players reached
+                if (players.length >= MAX_PLAYERS) {
+                    alert(`Maximum of ${MAX_PLAYERS} players allowed`);
+                    return;
+                }
+                
+                // Validation: duplicate name (case-insensitive)
+                if (players.some(p => p.toLowerCase() === playerName.toLowerCase())) {
+                    alert('Player with this name already exists');
+                    playerNameInput.value = '';
+                    playerNameInput.focus();
+                    return;
+                }
+                
+                // Add player
+                players.push(playerName);
+                updateUI();
+            }
+
+            /**
+             * Escape HTML to prevent XSS
+             */
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Event listeners
+            addPlayerBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                addPlayer();
+            });
+
+            playerNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addPlayer();
+                }
+            });
+
+            // Initialize UI
+            updateUI();
+        })();
+    </script>
+</body>
+</html>
