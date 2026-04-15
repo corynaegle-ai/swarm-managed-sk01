@@ -28,6 +28,10 @@ window.gameApp = function() {
       transition: false
     },
 
+    // Input state for bid and trick collection
+    bidInput: {},
+    tricksInput: {},
+
     // Component references
     bidManager: null,
     bidCollectionUI: null,
@@ -43,6 +47,21 @@ window.gameApp = function() {
       this.uiState.showGameBoard = false;
       this.uiState.showScoring = false;
       this.uiState.showFinalScores = false;
+      this.bidInput = {};
+      this.tricksInput = {};
+    },
+
+    /**
+     * Initialize and start a demo game with default players
+     */
+    initializeGameDemo() {
+      console.log('Initializing demo game');
+      const demoPlayers = [
+        { id: 'p1', name: 'Captain Blackbeard' },
+        { id: 'p2', name: 'Anne Bonny' },
+        { id: 'p3', name: 'Calico Jack' }
+      ];
+      this.startGame(demoPlayers);
     },
 
     /**
@@ -100,6 +119,10 @@ window.gameApp = function() {
       this.gameState.bids = {};
       this.gameState.tricks = {};
       
+      // Reset input states for new round
+      this.bidInput = {};
+      this.tricksInput = {};
+      
       // Show bid collection UI
       this.showBidCollectionPhase();
     },
@@ -121,6 +144,29 @@ window.gameApp = function() {
         this.uiState.showBidCollection = true;
         this.uiState.transition = false;
       }, 300);
+    },
+
+    /**
+     * Submit a bid from a player via UI
+     * Validates and registers the bid
+     * @param {string} playerId - Player ID
+     */
+    submitPlayerBid(playerId) {
+      const bidAmount = this.bidInput[playerId];
+      
+      // Validate that a bid was entered
+      if (bidAmount === undefined || bidAmount === null || bidAmount === '') {
+        console.error('No bid entered for player:', playerId);
+        return;
+      }
+
+      // Register the bid through proper validation
+      if (this.registerBid(playerId, bidAmount)) {
+        // Bid was successfully registered
+        console.log('Bid submitted successfully for player:', playerId);
+      } else {
+        console.error('Failed to register bid for player:', playerId);
+      }
     },
 
     /**
@@ -240,6 +286,32 @@ window.gameApp = function() {
     },
 
     /**
+     * Submit all tricks from UI inputs and proceed to scoring
+     * @returns {boolean} True if tricks submitted successfully
+     */
+    submitTricksAndScore() {
+      console.log('Submitting tricks from UI');
+      
+      // Register all tricks from input
+      for (let playerId in this.tricksInput) {
+        const tricksWon = this.tricksInput[playerId];
+        
+        // Skip empty/undefined inputs
+        if (tricksWon === undefined || tricksWon === null || tricksWon === '') {
+          continue;
+        }
+
+        if (!this.registerTricks(playerId, tricksWon)) {
+          console.error('Failed to register tricks for player:', playerId);
+          return false;
+        }
+      }
+
+      // Verify all trick data has been collected
+      return this.completeRound();
+    },
+
+    /**
      * Complete current round and calculate scores
      * @returns {boolean} True if round completed successfully
      */
@@ -265,7 +337,7 @@ window.gameApp = function() {
 
     /**
      * Calculate scores for current round
-     * Scoring: If bid matches tricks won, award 10 + bid points
+     * Scoring: If bid matches tricks won, award 10 points
      *          Otherwise, award -5 points
      */
     calculateRoundScores() {
@@ -279,8 +351,8 @@ window.gameApp = function() {
         let roundScore = 0;
         
         if (bid === tricks) {
-          // Made bid: 10 + bid amount
-          roundScore = 10 + bid;
+          // Made bid: 10 points
+          roundScore = 10;
         } else {
           // Failed bid: -5 points
           roundScore = -5;
@@ -374,9 +446,13 @@ window.gameApp = function() {
 
     /**
      * Get the game winner
-     * @returns {Object|null} Winner player object or null
+     * @returns {Object|null} Winner player object or null if no valid game state
      */
     getWinner() {
+      if (this.gameState.players.length === 0) {
+        return null;
+      }
+
       let maxScore = -Infinity;
       let winner = null;
       
