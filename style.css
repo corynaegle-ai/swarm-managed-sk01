@@ -1,5 +1,4 @@
-/* Base styles for Vanilla JS App */
-
+/* Global Styles */
 * {
     margin: 0;
     padding: 0;
@@ -7,28 +6,317 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.6;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #2c2410 0%, #4a3f2f 50%, #2c2410 100%);
     color: #333;
-    background-color: #f5f5f5;
+    min-height: 100vh;
+    padding: 2rem 1rem;
 }
 
 #app {
     max-width: 1200px;
     margin: 0 auto;
+    background: linear-gradient(to bottom, #FFF8DC 0%, #FFEBCD 100%);
     padding: 2rem;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 3px solid #8B4513;
 }
 
 h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #222;
+    color: #8B4513;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+h2 {
+    color: #654321;
+    font-size: 1.8em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 p {
-    font-size: 1rem;
-    color: #666;
+    color: #555;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+/* Pirate Theme Button */
+.pirate-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.pirate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.pirate-btn:active {
+    transform: translateY(0);
+}
+
+/* Scoreboard Container */
+.scoreboard-container {
+    background: linear-gradient(135deg, #FFEFD5 0%, #FFE4B5 100%);
+    border: 4px solid #8B4513;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    margin-top: 2rem;
+}
+
+.treasure-chest-header {
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+    border: 3px solid #DAA520;
+    border-radius: 8px 8px 0 0;
+    padding: 1.5rem;
+    color: #FFD700;
+    margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+    text-align: center;
+}
+
+.treasure-chest-header h2 {
+    color: #FFD700;
+    font-size: 1.6em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.treasure-icon {
+    font-size: 1.3em;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Scoreboard Wrapper and Table */
+.scoreboard-wrapper {
+    overflow-x: auto;
+    margin: 1rem 0;
+    border-radius: 8px;
+    background: white;
+}
+
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+}
+
+.scoreboard-header-row {
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+    color: #FFD700;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.scoreboard-header-row th {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 3px solid #DAA520;
+    font-size: 0.85em;
+}
+
+.scoreboard-header-row th:first-child {
+    text-align: left;
+    border-radius: 0;
+}
+
+.scoreboard-row {
+    border-bottom: 1px solid #DEB887;
+    transition: background-color 0.2s ease;
+}
+
+.scoreboard-row:hover {
+    background-color: rgba(218, 165, 32, 0.15) !important;
+}
+
+.scoreboard-row td {
+    padding: 1rem;
+    text-align: center;
+    color: #333;
+}
+
+.scoreboard-row td:first-child {
+    text-align: left;
+    font-weight: bold;
+}
+
+.player-rank {
+    display: inline-block;
+    background: linear-gradient(135deg, #DAA520, #FFD700);
+    color: #333;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    font-size: 0.85em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.round-zero {
+    color: #999;
+    font-weight: bold;
+}
+
+.scoreboard-footer {
+    background: rgba(218, 165, 32, 0.1);
+    border-top: 2px solid #DAA520;
+    border-radius: 0 0 8px 8px;
+    padding: 1rem;
+    text-align: center;
+    color: #654321;
+    font-size: 0.9em;
+    margin: 0 -1.5rem -1.5rem -1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #app {
+        padding: 1.5rem;
+        border: 2px solid #8B4513;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    .scoreboard-container {
+        padding: 1rem;
+        border: 3px solid #8B4513;
+    }
+    
+    .treasure-chest-header {
+        margin: -1rem -1rem 1rem -1rem;
+        padding: 1rem;
+    }
+    
+    .treasure-chest-header h2 {
+        font-size: 1.3em;
+    }
+    
+    .scoreboard-table {
+        font-size: 0.85em;
+    }
+    
+    .scoreboard-header-row th,
+    .scoreboard-row td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .player-rank {
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        margin-right: 0.25rem;
+        font-size: 0.75em;
+    }
+    
+    .scoreboard-footer {
+        margin: 0 -1rem -1rem -1rem;
+        padding: 0.75rem;
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 1rem;
+    }
+    
+    #app {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.4em;
+        margin-bottom: 0.75rem;
+    }
+    
+    .pirate-btn {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.9em !important;
+        width: 100%;
+    }
+    
+    .scoreboard-container {
+        padding: 0.75rem;
+        border: 2px solid #8B4513;
+        margin-top: 1rem;
+    }
+    
+    .treasure-chest-header {
+        margin: -0.75rem -0.75rem 1rem -0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .treasure-chest-header h2 {
+        font-size: 1.1em;
+    }
+    
+    .treasure-icon {
+        font-size: 1em;
+    }
+    
+    .scoreboard-table {
+        font-size: 0.75em;
+    }
+    
+    .scoreboard-header-row th,
+    .scoreboard-row td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .scoreboard-row td:first-child {
+        padding: 0.5rem;
+    }
+    
+    .player-rank {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        margin-right: 0.25rem;
+        font-size: 0.65em;
+    }
+    
+    .scoreboard-footer {
+        margin: 0 -0.75rem -0.75rem -0.75rem;
+        padding: 0.5rem;
+        font-size: 0.7em;
+    }
+    
+    .scoreboard-footer p {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .scoreboard-footer span {
+        display: block !important;
+        margin-right: 0 !important;
+    }
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
 }
