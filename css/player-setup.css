@@ -1,240 +1,176 @@
-/* Player Setup Styles */
-
-.player-setup-container {
+.setup-container {
     max-width: 600px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #f9f9f9;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f5f5f5;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
 }
 
-.player-setup-container h1 {
+.setup-container h1 {
     text-align: center;
     color: #333;
-    margin-bottom: 0.5rem;
-    font-size: 2rem;
+    margin-bottom: 20px;
 }
 
-.player-setup-container .subtitle {
+.setup-container h2 {
+    color: #555;
+    font-size: 1.2em;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.player-count {
     text-align: center;
+    font-size: 1.1em;
     color: #666;
-    margin-bottom: 2rem;
-    font-size: 1rem;
-}
-
-/* Form Section */
-.setup-form-section {
-    background-color: #fff;
-    padding: 1.5rem;
-    border-radius: 6px;
-    margin-bottom: 2rem;
-    border: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+    font-weight: bold;
 }
 
 .player-form {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    border: 1px solid #ddd;
 }
 
 .form-group {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    margin-bottom: 8px;
     color: #333;
-    font-size: 0.95rem;
+    font-weight: bold;
+    font-size: 0.95em;
 }
 
-.player-input {
-    padding: 0.75rem;
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
     border: 2px solid #ddd;
     border-radius: 4px;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
 }
 
-.player-input:focus {
+.form-group input[type="text"]:focus {
     outline: none;
     border-color: #4CAF50;
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
-/* Buttons */
+.form-group input[type="text"]:invalid {
+    border-color: #f44336;
+}
+
+.error-message {
+    display: block;
+    color: #f44336;
+    font-size: 0.85em;
+    margin-top: 5px;
+    min-height: 20px;
+}
+
 .btn {
-    padding: 0.75rem 1.5rem;
+    padding: 10px 20px;
     border: none;
     border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 1em;
     cursor: pointer;
-    font-family: inherit;
-    transition: all 0.3s ease;
-}
-
-.btn-add {
-    background-color: #4CAF50;
-    color: white;
-    align-self: flex-end;
-    white-space: nowrap;
-}
-
-.btn-add:hover:not(:disabled) {
-    background-color: #45a049;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn-add:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-    opacity: 0.6;
+    font-weight: bold;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
 }
 
 .btn-primary {
     background-color: #2196F3;
     color: white;
     width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
 }
 
 .btn-primary:hover:not(:disabled) {
     background-color: #0b7dda;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary:disabled {
-    background-color: #ccc;
+    background-color: #cccccc;
     cursor: not-allowed;
     opacity: 0.6;
 }
 
-.btn-remove {
+.btn-success {
+    background-color: #4CAF50;
+    color: white;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-success:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+.btn-success:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.btn-danger {
     background-color: #f44336;
     color: white;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 6px 12px;
+    font-size: 0.9em;
+    margin-left: 10px;
 }
 
-.btn-remove:hover {
+.btn-danger:hover {
     background-color: #da190b;
-    transform: translateY(-1px);
 }
 
-/* Player Count */
-.player-count {
-    text-align: center;
-    font-size: 0.95rem;
-    color: #666;
-    font-weight: 500;
-}
-
-#playerCount {
-    color: #4CAF50;
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-/* Player List Section */
-.player-list-section {
-    background-color: #fff;
-    padding: 1.5rem;
+.players-section {
+    background-color: white;
+    padding: 20px;
     border-radius: 6px;
-    margin-bottom: 2rem;
-    border: 1px solid #e0e0e0;
-}
-
-.player-list-section h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #333;
-    font-size: 1.25rem;
+    border: 1px solid #ddd;
+    min-height: 100px;
 }
 
 .players-list {
-    list-style: none;
+    list-style-position: inside;
     padding: 0;
     margin: 0;
 }
 
-.player-item {
+.players-list li {
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border-left: 4px solid #2196F3;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    background-color: #f5f5f5;
-    border-left: 4px solid #4CAF50;
-    margin-bottom: 0.75rem;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
-
-.player-item:hover {
-    background-color: #f0f0f0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.player-name {
-    font-weight: 600;
     color: #333;
+}
+
+.players-list li:last-child {
+    margin-bottom: 0;
+}
+
+.player-item-text {
     flex: 1;
     word-break: break-word;
 }
 
-.empty-message {
-    text-align: center;
+.players-list:empty::before {
+    content: "No players added yet";
     color: #999;
     font-style: italic;
-    padding: 2rem 1rem;
-    margin: 0;
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-    .player-setup-container {
-        padding: 1rem;
-    }
-
-    .player-form {
-        flex-direction: column;
-    }
-
-    .form-group {
-        min-width: 100%;
-    }
-
-    .btn-add {
-        align-self: stretch;
-    }
-
-    .player-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
-
-    .btn-remove {
-        width: 100%;
-    }
-
-    .player-setup-container h1 {
-        font-size: 1.5rem;
-    }
+    display: block;
+    padding: 20px;
+    text-align: center;
 }
