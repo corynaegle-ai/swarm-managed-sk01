@@ -1,19 +1,73 @@
-/* Scoreboard styles */
+/* Scoreboard-specific CSS (supplementary styles) */
+
+/* Additional animations for scoreboard */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 .scoreboard-container {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background-color: #f9f9f9;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+    animation: slideDown 0.3s ease-out;
 }
 
-.scoreboard-title {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: #222;
+/* Pirate color palette variables */
+:root {
+    --pirate-dark-brown: #8B4513;
+    --pirate-light-brown: #D2691E;
+    --pirate-gold: #DAA520;
+    --pirate-sand: #FFEFD5;
+    --pirate-parchment: #FFF8DC;
 }
 
-.scoreboard-content {
-    padding: 1rem;
+/* Enhanced table styling for better pirate aesthetic */
+.scoreboard-table tbody tr:nth-child(odd) {
+    background-color: rgba(139, 69, 19, 0.05);
+}
+
+.scoreboard-table tbody tr:hover {
+    background-color: rgba(218, 165, 32, 0.2);
+    transition: background-color 0.15s ease;
+}
+
+/* Treasure chest visual effects */
+.treasure-chest-header::before {
+    content: '🏴‍☠️';
+    margin-right: 1rem;
+}
+
+.treasure-chest-header::after {
+    content: '🏴‍☠️';
+    margin-left: 1rem;
+}
+
+/* Skull and crossbones decoration */
+.player-rank {
+    box-shadow: 0 2px 8px rgba(218, 165, 32, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Total score highlight */
+.scoreboard-table tbody td:last-child {
+    background: linear-gradient(to right, rgba(218, 165, 32, 0.1), rgba(218, 165, 32, 0.2));
+    font-weight: bold;
+    color: #8B4513;
+}
+
+/* Print styles for pirate scoreboard */
+@media print {
+    .scoreboard-container {
+        border: 2px solid #000;
+        break-inside: avoid;
+    }
+    
+    .treasure-chest-header {
+        background: #8B4513;
+        color: #000;
+    }
 }
