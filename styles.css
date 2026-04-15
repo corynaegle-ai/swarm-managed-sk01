@@ -396,6 +396,36 @@ button[x-on\:click="toggleSailingMode"]:hover {
 }
 
 /* ============================================================
+   THEME TRANSITION CLASSES (For smooth theme switching)
+   ============================================================ */
+
+.pirate-theme-transitioning {
+  transition: var(--pirate-transition-slow);
+}
+
+.pirate-theme-transition-active {
+  background-color: var(--pirate-bg-light);
+  color: var(--pirate-text-light);
+  transition: var(--pirate-transition-slow);
+}
+
+/* ============================================================
+   ACCESSIBILITY - Screen Reader Only Content
+   ============================================================ */
+
+.pirate-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ============================================================
    ACCESSIBILITY & PRINT STYLES
    ============================================================ */
 
