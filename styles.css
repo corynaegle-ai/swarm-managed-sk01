@@ -1,0 +1,533 @@
+/* ============================================
+   Pirate Theme UI - Comprehensive Styling
+   ============================================ */
+
+/* Root Variables */
+:root {
+  /* Pirate Color Scheme */
+  --pirate-navy: #1a2a3a;
+  --pirate-dark-navy: #0d1820;
+  --pirate-gold: #d4af37;
+  --pirate-brown: #8b6f47;
+  --pirate-light-brown: #a0826d;
+  --pirate-cream: #f5e6d3;
+  --pirate-red: #b91c1c;
+  --pirate-white: #ffffff;
+  --pirate-black: #000000;
+
+  /* Fonts */
+  --pirate-font-heading: 'Georgia', 'Courier New', serif;
+  --pirate-font-body: 'Trebuchet MS', 'Lucida Grande', sans-serif;
+}
+
+/* ============================================
+   Global Styles
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background: linear-gradient(
+    135deg,
+    var(--pirate-dark-navy) 0%,
+    var(--pirate-navy) 50%,
+    var(--pirate-brown) 100%
+  );
+  color: var(--pirate-cream);
+  font-family: var(--pirate-font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.pirate-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ============================================
+   Header Styling
+   ============================================ */
+
+.pirate-header {
+  background: linear-gradient(180deg, var(--pirate-dark-navy) 0%, var(--pirate-navy) 100%);
+  border-bottom: 4px solid var(--pirate-gold);
+  padding: 2rem 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.skull-icon,
+.ship-icon {
+  font-size: 2.5rem;
+  animation: bounce 2s infinite;
+}
+
+.ship-icon {
+  animation-delay: 0.5s;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pirate-title {
+  font-family: var(--pirate-font-heading);
+  font-size: 2.5rem;
+  color: var(--pirate-gold);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 2px;
+}
+
+/* ============================================
+   Navigation Styling
+   ============================================ */
+
+.pirate-nav {
+  background-color: var(--pirate-navy);
+  border-bottom: 2px solid var(--pirate-brown);
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.nav-link {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: var(--pirate-cream);
+  text-decoration: none;
+  font-family: var(--pirate-font-heading);
+  font-weight: bold;
+  transition: all 0.3s ease;
+  border-right: 1px solid var(--pirate-brown);
+  position: relative;
+}
+
+.nav-link:last-child {
+  border-right: none;
+}
+
+.nav-link:hover {
+  background-color: var(--pirate-brown);
+  color: var(--pirate-gold);
+  padding-top: 0.8rem;
+  padding-bottom: 1.2rem;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: var(--pirate-gold);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::before {
+  width: 100%;
+}
+
+/* ============================================
+   Main Content Styling
+   ============================================ */
+
+.pirate-main {
+  flex: 1;
+  padding: 2rem 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section-title {
+  font-family: var(--pirate-font-heading);
+  font-size: 2rem;
+  color: var(--pirate-gold);
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  border-bottom: 2px solid var(--pirate-brown);
+  padding-bottom: 0.5rem;
+}
+
+.section-text {
+  color: var(--pirate-cream);
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Hero Section */
+
+.hero-section {
+  background: linear-gradient(
+    135deg,
+    rgba(26, 42, 58, 0.8) 0%,
+    rgba(139, 111, 71, 0.6) 100%
+  );
+  border: 2px solid var(--pirate-gold);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+/* Form Section */
+
+.form-section {
+  background: linear-gradient(
+    135deg,
+    rgba(26, 42, 58, 0.8) 0%,
+    rgba(139, 111, 71, 0.6) 100%
+  );
+  border: 2px solid var(--pirate-brown);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.pirate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-family: var(--pirate-font-heading);
+  color: var(--pirate-gold);
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.pirate-input {
+  padding: 0.75rem 1rem;
+  background-color: var(--pirate-cream);
+  color: var(--pirate-dark-navy);
+  border: 2px solid var(--pirate-brown);
+  border-radius: 4px;
+  font-family: var(--pirate-font-body);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.pirate-input:focus {
+  outline: none;
+  background-color: var(--pirate-white);
+  border-color: var(--pirate-gold);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.pirate-input::placeholder {
+  color: var(--pirate-brown);
+}
+
+/* Button Styling */
+
+.pirate-button {
+  padding: 0.75rem 1.5rem;
+  font-family: var(--pirate-font-heading);
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.button-primary {
+  background-color: var(--pirate-gold);
+  color: var(--pirate-dark-navy);
+}
+
+.button-primary:hover {
+  background-color: #e6c200;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.button-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.button-secondary {
+  background-color: var(--pirate-brown);
+  color: var(--pirate-cream);
+}
+
+.button-secondary:hover {
+  background-color: var(--pirate-light-brown);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.button-secondary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Links Section */
+
+.links-section {
+  background: linear-gradient(
+    135deg,
+    rgba(26, 42, 58, 0.8) 0%,
+    rgba(139, 111, 71, 0.6) 100%
+  );
+  border: 2px solid var(--pirate-gold);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.links-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.quick-link {
+  display: block;
+  padding: 1rem;
+  background-color: rgba(212, 175, 55, 0.1);
+  color: var(--pirate-gold);
+  text-decoration: none;
+  border: 2px solid var(--pirate-gold);
+  border-radius: 4px;
+  text-align: center;
+  font-family: var(--pirate-font-heading);
+  font-weight: bold;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--pirate-gold);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.quick-link:hover {
+  color: var(--pirate-dark-navy);
+}
+
+.quick-link:hover::before {
+  left: 0;
+}
+
+/* ============================================
+   Footer Styling
+   ============================================ */
+
+.pirate-footer {
+  background-color: var(--pirate-dark-navy);
+  border-top: 4px solid var(--pirate-gold);
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--pirate-cream);
+  font-size: 0.9rem;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   Responsive Design - Mobile First
+   ============================================ */
+
+@media (max-width: 768px) {
+  .pirate-title {
+    font-size: 1.8rem;
+  }
+
+  .skull-icon,
+  .ship-icon {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .nav-link {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .pirate-main {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .form-section,
+  .hero-section,
+  .links-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .pirate-form {
+    gap: 1rem;
+  }
+
+  .links-container {
+    grid-template-columns: 1fr;
+  }
+
+  .pirate-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pirate-title {
+    font-size: 1.5rem;
+  }
+
+  .skull-icon,
+  .ship-icon {
+    font-size: 1.5rem;
+  }
+
+  .header-content {
+    gap: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .section-text {
+    font-size: 0.9rem;
+  }
+
+  .nav-list {
+    gap: 0;
+  }
+
+  .nav-link {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+    border-right: none;
+    border-bottom: 1px solid var(--pirate-brown);
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .pirate-nav {
+    border-bottom: 2px solid var(--pirate-brown);
+  }
+
+  .nav-list {
+    flex-direction: column;
+  }
+
+  .pirate-main {
+    padding: 1rem 0.5rem;
+  }
+
+  .form-section,
+  .hero-section,
+  .links-section {
+    padding: 1rem 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .pirate-input {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .pirate-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .pirate-footer {
+    padding: 1rem 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================
+   Accessibility & Print Styles
+   ============================================ */
+
+@media print {
+  body {
+    background: var(--pirate-cream);
+    color: var(--pirate-dark-navy);
+  }
+
+  .pirate-nav {
+    display: none;
+  }
+
+  .pirate-header {
+    border-bottom: 2px solid var(--pirate-dark-navy);
+  }
+
+  .pirate-footer {
+    border-top: 2px solid var(--pirate-dark-navy);
+  }
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 3px solid var(--pirate-gold);
+  outline-offset: 2px;
+}

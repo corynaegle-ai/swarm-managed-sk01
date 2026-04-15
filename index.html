@@ -3,14 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vanilla JS App</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Pirate Theme UI</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="app">
-        <h1>Welcome to Vanilla JS App</h1>
-        <p>Application ready for development</p>
+    <div class="pirate-container">
+        <!-- Header -->
+        <header class="pirate-header">
+            <div class="header-content">
+                <div class="skull-icon">☠</div>
+                <h1 class="pirate-title">The Pirate's Cove</h1>
+                <div class="ship-icon">⛵</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="pirate-nav">
+            <ul class="nav-list">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#treasure" class="nav-link">Treasure</a></li>
+                <li><a href="#crew" class="nav-link">Crew</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="pirate-main">
+            <section class="hero-section">
+                <h2 class="section-title">Welcome, Matey!</h2>
+                <p class="section-text">Embark on an adventure across the seven seas with our pirate-themed interface.</p>
+            </section>
+
+            <!-- Form Section -->
+            <section class="form-section">
+                <h2 class="section-title">Join Our Crew</h2>
+                <form id="crewForm" class="pirate-form">
+                    <div class="form-group">
+                        <label for="crewName" class="form-label">Pirate Name:</label>
+                        <input type="text" id="crewName" class="pirate-input" placeholder="Enter your fearsome name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="crewRole" class="form-label">Desired Role:</label>
+                        <select id="crewRole" class="pirate-input">
+                            <option value="">Select a role...</option>
+                            <option value="captain">Captain</option>
+                            <option value="navigator">Navigator</option>
+                            <option value="lookout">Lookout</option>
+                            <option value="sailor">Sailor</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="crewExperience" class="form-label">Years at Sea:</label>
+                        <input type="number" id="crewExperience" class="pirate-input" placeholder="How many years?" min="0">
+                    </div>
+
+                    <button type="submit" class="pirate-button button-primary">Set Sail!</button>
+                    <button type="reset" class="pirate-button button-secondary">Clear</button>
+                </form>
+            </section>
+
+            <!-- Links Section -->
+            <section class="links-section">
+                <h2 class="section-title">Quick Links</h2>
+                <div class="links-container">
+                    <a href="#" class="quick-link" data-link="Treasure Map">Treasure Map</a>
+                    <a href="#" class="quick-link" data-link="Ship's Log">Ship's Log</a>
+                    <a href="#" class="quick-link" data-link="Crew Directory">Crew Directory</a>
+                    <a href="#" class="quick-link" data-link="Battle Records">Battle Records</a>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="pirate-footer">
+            <p>&copy; 2024 The Pirate's Cove. All rights reserved. ☠ ⛵ ☠</p>
+        </footer>
     </div>
-    <script src="app.js"></script>
+
+    <script src="script.js"></script>
 </body>
 </html>
