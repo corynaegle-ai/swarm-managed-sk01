@@ -1,162 +1,196 @@
 /**
- * Pirate Theme Interactive Script
- * Handles theme switching, animations, and Alpine.js reactive behaviors
- * Uses Alpine.js for state management and DOM reactivity
+ * Pirate Theme Interactive System
+ * Handles theme switching, animations, hover effects, and responsive behavior
+ * Uses Alpine.js for state management and reactive DOM updates
  */
 
-// Wait for Alpine.js to be available, then register the data component
-document.addEventListener('alpine:init', () => {
-  Alpine.data('pirateTheme', () => ({
-    // State management
-    isDarkMode: false,
-    isSailingMode: false,
-    screenSize: 'desktop', // 'mobile', 'tablet', 'desktop'
-    themeInitialized: false,
+// Alpine.js Data Object for Pirate Theme State Management
+function pirateTheme() {
+  return {
+    isDarkMode: localStorage.getItem('pirateThemeDarkMode') === 'true',
+    isSailingMode: localStorage.getItem('pirateSailingMode') === 'true',
+    screenSize: 'desktop',
 
     /**
-     * Initialize theme from localStorage
+     * Initialize the theme system
+     * Called when Alpine.js initializes
      */
-    initTheme() {
-      if (this.themeInitialized) return;
-      
-      // Load persisted theme preference
-      const savedDarkMode = localStorage.getItem('pirateThemeDarkMode');
-      const savedSailingMode = localStorage.getItem('pirateThemeSailingMode');
-      
-      if (savedDarkMode !== null) {
-        this.isDarkMode = JSON.parse(savedDarkMode);
-      }
-      
-      if (savedSailingMode !== null) {
-        this.isSailingMode = JSON.parse(savedSailingMode);
-      }
-      
-      // Apply initial theme
+    init() {
       this.applyTheme();
-      
-      // Set up responsive behavior
-      this.updateScreenSize();
-      window.addEventListener('resize', () => this.updateScreenSize());
-      
-      // Set up interactive hover effects
+      this.setupResponsiveListener();
       this.setupInteractiveHovers();
-      
-      this.themeInitialized = true;
     },
 
     /**
-     * Toggle dark mode theme
+     * Toggle between dark and light mode
+     * Persists to localStorage
      */
     toggleTheme() {
       this.isDarkMode = !this.isDarkMode;
+      localStorage.setItem('pirateThemeDarkMode', this.isDarkMode);
       this.applyTheme();
-      
-      // Persist to localStorage
-      localStorage.setItem('pirateThemeDarkMode', JSON.stringify(this.isDarkMode));
     },
 
     /**
-     * Toggle sailing mode (animated effects)
+     * Toggle sailing mode (animations)
+     * Persists to localStorage
      */
     toggleSailingMode() {
       this.isSailingMode = !this.isSailingMode;
+      localStorage.setItem('pirateSailingMode', this.isSailingMode);
       this.applyTheme();
-      
-      // Persist to localStorage
-      localStorage.setItem('pirateThemeSailingMode', JSON.stringify(this.isSailingMode));
     },
 
     /**
-     * Apply theme by manipulating CSS classes on root element
+     * Apply theme classes to the root element
+     * Handles theme state, sailing mode, and responsive classes
      */
     applyTheme() {
       const root = document.documentElement;
-      
-      // Remove all theme classes
-      root.classList.remove('pirate-light-mode', 'pirate-dark-mode');
-      root.classList.remove('pirate-sailing', 'pirate-no-sailing');
-      root.classList.remove('pirate-mobile', 'pirate-tablet', 'pirate-desktop');
-      
-      // Apply dark/light mode class
+
+      // Remove all theme-related classes
+      root.classList.remove(
+        'pirate-light-mode',
+        'pirate-dark-mode',
+        'pirate-sailing',
+        'pirate-no-sailing',
+        'pirate-mobile',
+        'pirate-tablet',
+        'pirate-desktop',
+        'pirate-dark-active',
+        'pirate-sailing-active'
+      );
+
+      // Apply theme mode classes
       if (this.isDarkMode) {
-        root.classList.add('pirate-dark-mode');
+        root.classList.add('pirate-dark-mode', 'pirate-dark-active');
       } else {
         root.classList.add('pirate-light-mode');
       }
-      
-      // Apply sailing mode class
+
+      // Apply sailing mode classes
       if (this.isSailingMode) {
-        root.classList.add('pirate-sailing');
+        root.classList.add('pirate-sailing', 'pirate-sailing-active');
       } else {
         root.classList.add('pirate-no-sailing');
       }
-      
-      // Apply responsive class
-      root.classList.add(`pirate-${this.screenSize}`);
+
+      // Apply responsive size classes
+      this.updateResponsiveClass();
     },
 
     /**
-     * Update screen size and apply responsive classes
+     * Update responsive class based on screen size
+     * Mobile: < 768px
+     * Tablet: 768px - 1023px
+     * Desktop: >= 1024px
      */
-    updateScreenSize() {
+    updateResponsiveClass() {
+      const root = document.documentElement;
       const width = window.innerWidth;
-      
-      let newSize = 'desktop';
+
+      root.classList.remove('pirate-mobile', 'pirate-tablet', 'pirate-desktop');
+
       if (width < 768) {
-        newSize = 'mobile';
+        root.classList.add('pirate-mobile');
+        this.screenSize = 'mobile';
       } else if (width < 1024) {
-        newSize = 'tablet';
+        root.classList.add('pirate-tablet');
+        this.screenSize = 'tablet';
       } else {
-        newSize = 'desktop';
-      }
-      
-      if (newSize !== this.screenSize) {
-        this.screenSize = newSize;
-        this.applyTheme();
+        root.classList.add('pirate-desktop');
+        this.screenSize = 'desktop';
       }
     },
 
     /**
-     * Set up interactive hover effects on anchor links
+     * Setup responsive listener for window resize
      */
-    setupInteractiveHovers() {
-      const anchors = document.querySelectorAll('a[data-pirate-anchor]');
-      
-      anchors.forEach(anchor => {
-        anchor.addEventListener('mouseenter', () => {
-          anchor.classList.add('pirate-anchor-hovered');
-        });
-        
-        anchor.addEventListener('mouseleave', () => {
-          anchor.classList.remove('pirate-anchor-hovered');
-        });
+    setupResponsiveListener() {
+      window.addEventListener('resize', () => {
+        this.updateResponsiveClass();
       });
     },
 
     /**
-     * Check if dark mode is currently active
+     * Setup interactive hover effects on elements with data-pirate-anchor attribute
+     * Adds and removes CSS classes on hover
      */
-    get isDark() {
-      return this.isDarkMode;
-    },
+    setupInteractiveHovers() {
+      const anchors = document.querySelectorAll('a[data-pirate-anchor]');
 
-    /**
-     * Check if sailing mode is currently active
-     */
-    get isSailing() {
-      return this.isSailingMode;
-    },
+      anchors.forEach((anchor) => {
+        // Add hover event listener
+        anchor.addEventListener('mouseenter', () => {
+          anchor.classList.add('pirate-anchor-hovered');
+          anchor.classList.add('pirate-interactive');
+        });
 
-    /**
-     * Get current screen size category
-     */
-    get currentScreenSize() {
-      return this.screenSize;
+        // Remove hover event listener
+        anchor.addEventListener('mouseleave', () => {
+          anchor.classList.remove('pirate-anchor-hovered');
+          anchor.classList.remove('pirate-interactive');
+        });
+
+        // Handle click interactions
+        anchor.addEventListener('click', (e) => {
+          // Prevent default if no href or data-href
+          if (!anchor.href && !anchor.dataset.href) {
+            e.preventDefault();
+          }
+        });
+      });
+    },
+  };
+}
+
+/**
+ * Alpine.js Initialization
+ * Registers the pirateTheme data component and initializes on DOM ready
+ */
+document.addEventListener('alpine:init', () => {
+  // Create the theme instance
+  const themeInstance = pirateTheme();
+
+  // Bind to the #app element via Alpine.js
+  const appElement = document.getElementById('app');
+  if (appElement) {
+    // Set x-data attribute for Alpine.js binding
+    appElement.setAttribute('x-data', JSON.stringify(themeInstance));
+
+    // Initialize Alpine on this element
+    Alpine.initializeElement(appElement);
+
+    // Call init after Alpine processes the element
+    if (appElement.__x) {
+      appElement.__x.init(themeInstance);
     }
-  }));
+  }
 });
 
-// Initialize theme when Alpine is ready
-document.addEventListener('alpine:initialized', () => {
-  // The data object will auto-initialize via x-init in the HTML
-});
+/**
+ * Fallback initialization if Alpine.js is not yet loaded
+ * This ensures the theme system works even if Alpine initialization is delayed
+ */
+if (typeof Alpine !== 'undefined' && Alpine.version) {
+  // Alpine is already loaded, initialize immediately
+  document.addEventListener('DOMContentLoaded', () => {
+    const themeInstance = pirateTheme();
+    const appElement = document.getElementById('app');
+    if (appElement) {
+      themeInstance.init();
+    }
+  });
+} else {
+  // Wait for Alpine to load
+  document.addEventListener('DOMContentLoaded', () => {
+    // Give Alpine time to initialize
+    setTimeout(() => {
+      const themeInstance = pirateTheme();
+      const appElement = document.getElementById('app');
+      if (appElement) {
+        themeInstance.init();
+      }
+    }, 100);
+  });
+}
