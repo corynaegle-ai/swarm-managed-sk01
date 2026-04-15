@@ -1,4 +1,126 @@
-/* ============================================================
+/**
+ * Pirate Theme CSS Classes for JavaScript Interactions
+ * These classes are managed by script.js and Alpine.js for dynamic styling
+ */
+
+/* Theme mode classes */
+html.pirate-light-mode {
+    color-scheme: light;
+}
+
+html.pirate-dark-mode {
+    color-scheme: dark;
+}
+
+/* Hover state classes */
+html.pirate-hover-active {
+    /* Global hover effects can be applied here */
+}
+
+.pirate-interactive-hover {
+    /* Interactive element hover styling */
+    transition: all 0.2s ease-in-out;
+}
+
+.pirate-interactive-focus {
+    /* Interactive element focus styling */
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* Animation state classes */
+html.pirate-animation-active {
+    /* Global animation state effects */
+}
+
+.pirate-animated {
+    animation: pirateSwing 1s ease-in-out;
+}
+
+@keyframes pirateSwing {
+    0% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(10px) rotate(5deg);
+    }
+    100% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Pirate theme dark mode adjustments */
+html.pirate-dark-mode {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #f0f0f0;
+    --text-secondary: #b0b0b0;
+    --accent-color: #d4af37;
+    --border-color: #404040;
+}
+
+html.pirate-light-mode {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #1a1a1a;
+    --text-secondary: #4d4d4d;
+    --accent-color: #8b6914;
+    --border-color: #d0d0d0;
+}
+
+/* Smooth transitions for theme changes */
+html,
+body,
+body * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Disable transitions during animations */
+html.pirate-animation-active * {
+    transition: none;
+}
+
+/* Interactive element enhancements */
+button,
+a,
+[role="button"],
+input {
+    position: relative;
+}
+
+button:hover,
+a:hover,
+[role="button"]:hover {
+    cursor: pointer;
+}
+
+/* Accessibility: High contrast mode support */
+@media (prefers-contrast: more) {
+    .pirate-interactive-hover {
+        border-width: 2px;
+    }
+
+    .pirate-interactive-focus {
+        outline-width: 3px;
+    }
+}
+
+/* Accessibility: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    html,
+    body,
+    body * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .pirate-animated {
+        animation: none;
+    }
+}/* ============================================================
    PIRATE THEME - CSS Variables and Base Styles
    ============================================================ */
 

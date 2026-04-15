@@ -1,4 +1,153 @@
 /**
+ * Pirate Theme JavaScript Interactions
+ * Handles Alpine.js reactivity, theme switching, and dynamic styling
+ */
+
+(function() {
+    'use strict';
+
+    // Alpine.js component for pirate theme management
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create Alpine.js app for theme state management
+        if (typeof Alpine !== 'undefined') {
+            Alpine.data('pirateTheme', () => ({
+                isDarkMode: false,
+                isHovering: false,
+                animationActive: false,
+                currentTheme: 'light',
+
+                /**
+                 * Toggle between light and dark pirate themes
+                 */
+                toggleTheme() {
+                    this.isDarkMode = !this.isDarkMode;
+                    this.currentTheme = this.isDarkMode ? 'dark' : 'light';
+                    this.updateThemeClass();
+                },
+
+                /**
+                 * Update DOM classes based on current theme
+                 */
+                updateThemeClass() {
+                    const html = document.documentElement;
+                    if (this.isDarkMode) {
+                        html.classList.add('pirate-dark-mode');
+                        html.classList.remove('pirate-light-mode');
+                    } else {
+                        html.classList.add('pirate-light-mode');
+                        html.classList.remove('pirate-dark-mode');
+                    }
+                },
+
+                /**
+                 * Handle hover effects on interactive elements
+                 */
+                onHoverStart() {
+                    this.isHovering = true;
+                    document.documentElement.classList.add('pirate-hover-active');
+                },
+
+                onHoverEnd() {
+                    this.isHovering = false;
+                    document.documentElement.classList.remove('pirate-hover-active');
+                },
+
+                /**
+                 * Trigger pirate-themed animation
+                 */
+                triggerAnimation() {
+                    this.animationActive = true;
+                    document.documentElement.classList.add('pirate-animation-active');
+
+                    // Remove animation class after animation completes
+                    setTimeout(() => {
+                        this.animationActive = false;
+                        document.documentElement.classList.remove('pirate-animation-active');
+                    }, 1000);
+                },
+
+                /**
+                 * Initialize theme from localStorage or system preference
+                 */
+                init() {
+                    // Check for saved theme preference
+                    const savedTheme = localStorage.getItem('pirateTheme');
+                    if (savedTheme) {
+                        this.isDarkMode = savedTheme === 'dark';
+                        this.currentTheme = savedTheme;
+                    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        this.isDarkMode = true;
+                        this.currentTheme = 'dark';
+                    }
+
+                    this.updateThemeClass();
+
+                    // Listen for system theme changes
+                    if (window.matchMedia) {
+                        window.matchMedia('(prefers-color-scheme: dark)').addListener((e) => {
+                            if (!localStorage.getItem('pirateTheme')) {
+                                this.isDarkMode = e.matches;
+                                this.currentTheme = e.matches ? 'dark' : 'light';
+                                this.updateThemeClass();
+                            }
+                        });
+                    }
+                },
+
+                /**
+                 * Save theme preference to localStorage
+                 */
+                saveTheme() {
+                    localStorage.setItem('pirateTheme', this.currentTheme);
+                }
+            }));
+
+            // Add event delegation for interactive elements
+            setupInteractiveElements();
+        }
+    });
+
+    /**
+     * Setup interactive elements with pirate theme behaviors
+     */
+    function setupInteractiveElements() {
+        // Delegate hover effects to all interactive elements
+        const interactiveElements = document.querySelectorAll(
+            'button, a, [role="button"], input, .interactive'
+        );
+
+        interactiveElements.forEach((element) => {
+            element.addEventListener('mouseenter', function() {
+                this.classList.add('pirate-interactive-hover');
+            });
+
+            element.addEventListener('mouseleave', function() {
+                this.classList.remove('pirate-interactive-hover');
+            });
+
+            element.addEventListener('focus', function() {
+                this.classList.add('pirate-interactive-focus');
+            });
+
+            element.addEventListener('blur', function() {
+                this.classList.remove('pirate-interactive-focus');
+            });
+        });
+    }
+
+    /**
+     * Utility function to add pirate animation class
+     */
+    window.triggerPirateAnimation = function(element) {
+        if (element) {
+            element.classList.add('pirate-animated');
+            element.addEventListener('animationend', function() {
+                element.classList.remove('pirate-animated');
+            }, { once: true });
+        }
+    };
+
+})();/**
  * Pirate Theme JavaScript - Interactive Functionality
  * Handles Alpine.js reactivity, theme management, and DOM interactions
  * Uses CSS class addition/removal only - NO inline styles
