@@ -3,16 +3,479 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vanilla JS App</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/scoreboard.css">
+    <title>Pirate Theme UI - Swarm Managed</title>
+    <style>
+        :root {
+            --pirate-navy: #1a1f2e;
+            --pirate-gold: #d4af37;
+            --pirate-brown: #8b4513;
+            --pirate-light: #f4e4d4;
+            --pirate-accent: #c41e3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--pirate-navy);
+            color: var(--pirate-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(212, 175, 55, 0.03) 0px,
+                    rgba(212, 175, 55, 0.03) 2px,
+                    transparent 2px,
+                    transparent 4px
+                );
+        }
+
+        header {
+            background-color: var(--pirate-brown);
+            border-bottom: 4px solid var(--pirate-gold);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--pirate-gold);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--pirate-gold);
+            margin: 1.5rem 0 1rem 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            border-left: 4px solid var(--pirate-gold);
+            padding-left: 1rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--pirate-accent);
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--pirate-gold);
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .section {
+            background-color: rgba(139, 69, 19, 0.2);
+            border: 2px solid var(--pirate-gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .skull-crossbones {
+            width: 100px;
+            height: 100px;
+            margin: 1rem auto;
+        }
+
+        .ship-wheel {
+            width: 120px;
+            height: 120px;
+            margin: 1rem auto;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            justify-content: center;
+        }
+
+        button {
+            background-color: var(--pirate-brown);
+            color: var(--pirate-gold);
+            border: 2px solid var(--pirate-gold);
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background-color: var(--pirate-gold);
+            color: var(--pirate-navy);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        button.secondary {
+            background-color: var(--pirate-navy);
+            border-color: var(--pirate-accent);
+            color: var(--pirate-accent);
+        }
+
+        button.secondary:hover {
+            background-color: var(--pirate-accent);
+            color: var(--pirate-light);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--pirate-gold);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: rgba(244, 228, 212, 0.1);
+            border: 2px solid var(--pirate-gold);
+            color: var(--pirate-light);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(212, 175, 55, 0.5);
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--pirate-accent);
+            box-shadow: 0 0 8px rgba(196, 30, 58, 0.3);
+            background-color: rgba(244, 228, 212, 0.05);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.75rem 0 0.75rem 2rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            position: relative;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li:before {
+            content: "☠";
+            position: absolute;
+            left: 0;
+            color: var(--pirate-accent);
+            font-size: 1.2rem;
+        }
+
+        .footer {
+            background-color: var(--pirate-brown);
+            border-top: 4px solid var(--pirate-gold);
+            color: var(--pirate-light);
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+        }
+
+        .anchor-divider {
+            text-align: center;
+            color: var(--pirate-gold);
+            font-size: 1.5rem;
+            margin: 2rem 0;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            main {
+                padding: 1rem 0.5rem;
+            }
+
+            .section {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .button-group {
+                gap: 0.75rem;
+            }
+
+            button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            .skull-crossbones {
+                width: 80px;
+                height: 80px;
+            }
+
+            .ship-wheel {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2rem;
+                letter-spacing: 1px;
+            }
+
+            header {
+                padding: 0.75rem;
+            }
+
+            h2 {
+                font-size: 1rem;
+            }
+
+            main {
+                padding: 0.75rem;
+            }
+
+            .section {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+                border: 1px solid var(--pirate-gold);
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                padding: 0.75rem;
+            }
+
+            input,
+            textarea,
+            select {
+                padding: 0.6rem;
+                font-size: 16px;
+            }
+
+            .skull-crossbones {
+                width: 70px;
+                height: 70px;
+            }
+
+            .ship-wheel {
+                width: 90px;
+                height: 90px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <h1>Welcome to Vanilla JS App</h1>
-        <p>Application ready for development</p>
-    </div>
-    <script src="js/scoreboardUI.js"></script>
-    <script src="app.js"></script>
+    <header>
+        <h1>⚓ PIRATE THEME UI ⚓</h1>
+        <p class="subtitle">Shiver me timbers! Welcome to the seven seas</p>
+    </header>
+
+    <main>
+        <div class="section">
+            <h2>Welcome Aboard</h2>
+            <svg class="skull-crossbones" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Skull -->
+                <circle cx="50" cy="35" r="20" fill="#d4af37" stroke="#8b4513" stroke-width="2"/>
+                <!-- Eye sockets -->
+                <circle cx="42" cy="30" r="4" fill="#1a1f2e"/>
+                <circle cx="58" cy="30" r="4" fill="#1a1f2e"/>
+                <!-- Nose -->
+                <rect x="48" y="36" width="4" height="4" fill="#1a1f2e"/>
+                <!-- Teeth -->
+                <line x1="40" y1="43" x2="60" y2="43" stroke="#8b4513" stroke-width="1"/>
+                <line x1="42" y1="43" x2="42" y2="46" stroke="#8b4513" stroke-width="1"/>
+                <line x1="46" y1="43" x2="46" y2="46" stroke="#8b4513" stroke-width="1"/>
+                <line x1="50" y1="43" x2="50" y2="46" stroke="#8b4513" stroke-width="1"/>
+                <line x1="54" y1="43" x2="54" y2="46" stroke="#8b4513" stroke-width="1"/>
+                <line x1="58" y1="43" x2="58" y2="46" stroke="#8b4513" stroke-width="1"/>
+                <!-- Crossbones -->
+                <line x1="25" y1="50" x2="75" y2="50" stroke="#d4af37" stroke-width="3"/>
+                <line x1="30" y1="45" x2="70" y2="55" stroke="#d4af37" stroke-width="3"/>
+                <!-- Bone ends -->
+                <circle cx="25" cy="50" r="3" fill="#d4af37"/>
+                <circle cx="75" cy="50" r="3" fill="#d4af37"/>
+                <circle cx="30" cy="45" r="3" fill="#d4af37"/>
+                <circle cx="70" cy="55" r="3" fill="#d4af37"/>
+            </svg>
+            <p>This pirate-themed interface brings authentic maritime styling to your application with navy, gold, and brown color schemes throughout.</p>
+        </div>
+
+        <div class="section">
+            <h2>Ship's Wheel Controls</h2>
+            <svg class="ship-wheel" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer rim -->
+                <circle cx="60" cy="60" r="55" fill="none" stroke="#d4af37" stroke-width="3"/>
+                <!-- Inner circle -->
+                <circle cx="60" cy="60" r="10" fill="#8b4513" stroke="#d4af37" stroke-width="2"/>
+                <!-- Spokes -->
+                <line x1="60" y1="10" x2="60" y2="110" stroke="#d4af37" stroke-width="2"/>
+                <line x1="10" y1="60" x2="110" y2="60" stroke="#d4af37" stroke-width="2"/>
+                <line x1="25" y1="25" x2="95" y2="95" stroke="#d4af37" stroke-width="2"/>
+                <line x1="95" y1="25" x2="25" y2="95" stroke="#d4af37" stroke-width="2"/>
+                <!-- Handles -->
+                <circle cx="60" cy="15" r="5" fill="#d4af37"/>
+                <circle cx="105" cy="60" r="5" fill="#d4af37"/>
+                <circle cx="60" cy="105" r="5" fill="#d4af37"/>
+                <circle cx="15" cy="60" r="5" fill="#d4af37"/>
+            </svg>
+            <p>Navigate with style using pirate-themed controls and interactive elements.</p>
+        </div>
+
+        <div class="anchor-divider">⚓ ⚓ ⚓</div>
+
+        <div class="section">
+            <h2>Features</h2>
+            <ul class="feature-list">
+                <li>Navy, gold, and brown color scheme throughout</li>
+                <li>Pirate-themed typography with monospace fonts</li>
+                <li>Skull and crossbones SVG imagery</li>
+                <li>Ship wheel decorative elements</li>
+                <li>Styled buttons with hover effects</li>
+                <li>Themed input fields and forms</li>
+                <li>Fully responsive mobile design</li>
+                <li>Maritime-inspired visual elements</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Command Quarters - Sign Up</h2>
+            <form onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="captain-name">Captain's Name</label>
+                    <input type="text" id="captain-name" name="captain-name" placeholder="Enter your captain name" required>
+                </div>
+                <div class="form-group">
+                    <label for="ship-name">Ship's Name</label>
+                    <input type="text" id="ship-name" name="ship-name" placeholder="What be the name of yer vessel?">
+                </div>
+                <div class="form-group">
+                    <label for="crew-size">Crew Size</label>
+                    <input type="number" id="crew-size" name="crew-size" placeholder="How many souls in yer crew?" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="treasure">Treasure Description</label>
+                    <textarea id="treasure" name="treasure" placeholder="Tell us about yer greatest treasure..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rank">Pirate Rank</label>
+                    <select id="rank" name="rank">
+                        <option value="">Choose yer rank...</option>
+                        <option value="cabin-boy">Cabin Boy</option>
+                        <option value="swabbie">Swabbie</option>
+                        <option value="first-mate">First Mate</option>
+                        <option value="captain">Captain</option>
+                        <option value="legend">Pirate Legend</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Hoist the Colors!</button>
+                    <button type="reset" class="secondary">Clear the Deck</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Action Buttons</h2>
+            <p>Experience themed button interactions:</p>
+            <div class="button-group">
+                <button onclick="alert('Shiver me timbers!')">Shiver Me Timbers!</button>
+                <button onclick="alert('Arrr, ye scallywag!')">Arrr!</button>
+                <button class="secondary" onclick="alert('Anchors aweigh!')">Anchors Aweigh!</button>
+                <button class="secondary" onclick="alert('Batten down the hatches!')">Batten Down</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>⚓ Pirate Theme UI - Swarm Managed Platform ⚓</p>
+        <p>May the wind be at your back and the gold in yer coffers!</p>
+        <p style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">© 2024 Ye Olde Swarm Collective</p>
+    </footer>
+
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            const captainName = document.getElementById('captain-name').value;
+            alert(`Welcome aboard, Captain ${captainName}! ⚓`);
+            event.target.reset();
+        }
+
+        // Add subtle animation on page load
+        window.addEventListener('load', function() {
+            const elements = document.querySelectorAll('.section');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.6s ease';
+                    el.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+    </script>
 </body>
 </html>
