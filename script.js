@@ -1,290 +1,298 @@
 /**
  * Pirate Theme Interactive Script
- * Handles smooth scrolling, form validation, animations, and interactive effects
+ * Handles smooth scrolling, form validation, animations, and mobile interactions
  */
 
-// Initialize when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-  initializeSmoothScrolling();
-  initializeButtonHandlers();
-  initializeFormValidation();
-  initializeMobileMenuToggle();
-  initializeEntranceAnimations();
-  initializeHoverEffects();
-});
+(function() {
+  'use strict';
 
-/**
- * Criterion 1: Smooth Scrolling Navigation
- * Implement smooth scrolling for navigation links between page sections
- */
-function initializeSmoothScrolling() {
-  // Delegate event listener for all navigation links
-  document.addEventListener('click', function(event) {
-    // Check if clicked element is a navigation link
-    const link = event.target.closest('a[href^="#"]');
-    if (!link) return;
+  // DOM Elements
+  const app = document.getElementById('app');
+  const mobileMenuBtn = document.querySelector('[data-mobile-menu-toggle]');
+  const navLinks = document.querySelectorAll('a[data-scroll-to]');
+  const form = document.querySelector('[data-pirate-form]');
+  const buttons = document.querySelectorAll('button:not([data-mobile-menu-toggle])');
+  const interactiveElements = document.querySelectorAll('[data-interactive]');
 
-    const targetId = link.getAttribute('href').substring(1);
-    const targetElement = document.getElementById(targetId);
+  /**
+   * Initialize all interactive features
+   */
+  function init() {
+    setupSmoothScrolling();
+    setupFormValidation();
+    setupMobileMenu();
+    setupButtonInteractions();
+    setupEntranceAnimations();
+    setupHoverEffects();
+  }
 
-    if (targetElement) {
-      event.preventDefault();
-
-      // Use native smooth scroll behavior
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-
-      // Close mobile menu if open after navigation
-      const mobileMenu = document.querySelector('nav.mobile-menu');
-      if (mobileMenu && mobileMenu.classList.contains('active')) {
-        mobileMenu.classList.remove('active');
-      }
-    }
-  });
-}
-
-/**
- * Criterion 2: Button Click Handlers with Visual Feedback
- * Add click handlers for buttons with CSS class-based visual feedback
- */
-function initializeButtonHandlers() {
-  // Delegate event listener for all buttons
-  document.addEventListener('click', function(event) {
-    const button = event.target.closest('button');
-    if (!button) return;
-
-    // Add active state class for visual feedback
-    button.classList.add('active');
-
-    // Remove active state after animation completes (300ms)
-    setTimeout(function() {
-      button.classList.remove('active');
-    }, 300);
-
-    // Add pressed animation class
-    button.classList.add('pressed');
-    setTimeout(function() {
-      button.classList.remove('pressed');
-    }, 150);
-  });
-}
-
-/**
- * Criterion 3: Form Validation with Pirate-Themed Messages
- * Create form validation with pirate-themed error messages
- */
-function initializeFormValidation() {
-  const forms = document.querySelectorAll('form');
-
-  forms.forEach(function(form) {
-    form.addEventListener('submit', function(event) {
-      const isValid = validateForm(form);
-      if (!isValid) {
-        event.preventDefault();
-      }
-    });
-
-    // Validate on blur for better UX
-    const inputs = form.querySelectorAll('input, textarea, select');
-    inputs.forEach(function(input) {
-      input.addEventListener('blur', function() {
-        validateField(input);
+  /**
+   * Smooth scrolling for navigation links
+   * Criterion 1: Implement smooth scrolling navigation between page sections
+   */
+  function setupSmoothScrolling() {
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('data-scroll-to');
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Close mobile menu if open
+          closeMobileMenu();
+        }
       });
     });
-  });
-}
-
-/**
- * Validate a single form field with pirate-themed messages
- */
-function validateField(field) {
-  let isValid = true;
-  let errorMessage = '';
-
-  // Remove existing error message
-  const existingError = field.parentElement.querySelector('.pirate-error');
-  if (existingError) {
-    existingError.remove();
-    field.classList.remove('error');
   }
 
-  // Check required fields
-  if (field.required && !field.value.trim()) {
-    isValid = false;
-    errorMessage = '🏴‍☠️ Arrr! This treasure map location be empty, matey!';
+  /**
+   * Form validation with pirate-themed messages
+   * Criterion 3: Create form validation with pirate-themed error messages
+   */
+  function setupFormValidation() {
+    if (!form) return;
+
+    const pirateMessages = {
+      required: "Arrr! This field be empty, ye scallywag!",
+      email: "Blow me down! That be not a proper email address, matey!",
+      minLength: "Shiver me timbers! That be too short, buccaneer!",
+      pattern: "Avast ye! That don't follow the rules, landlubber!"
+    };
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const inputs = form.querySelectorAll('input, textarea');
+      let isValid = true;
+
+      inputs.forEach(input => {
+        const error = validateField(input, pirateMessages);
+        if (error) {
+          isValid = false;
+          showFieldError(input, error);
+        } else {
+          clearFieldError(input);
+        }
+      });
+
+      if (isValid) {
+        form.classList.add('form-success');
+        setTimeout(() => {
+          form.classList.remove('form-success');
+          form.reset();
+        }, 2000);
+      }
+    });
   }
-  // Check email format
-  else if (field.type === 'email' && field.value.trim()) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(field.value)) {
-      isValid = false;
-      errorMessage = '🏴‍☠️ Shiver me timbers! That be not a valid pirate ship message address!';
+
+  /**
+   * Validate individual form field
+   */
+  function validateField(input, messages) {
+    const value = input.value.trim();
+    const type = input.getAttribute('type') || input.tagName.toLowerCase();
+    const required = input.hasAttribute('required');
+    const minLength = input.getAttribute('minlength');
+
+    if (required && !value) {
+      return messages.required;
+    }
+
+    if (value && type === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        return messages.email;
+      }
+    }
+
+    if (value && minLength && value.length < parseInt(minLength)) {
+      return messages.minLength;
+    }
+
+    return null;
+  }
+
+  /**
+   * Display field error with pirate message
+   */
+  function showFieldError(input, message) {
+    input.classList.add('field-error');
+    let errorElement = input.nextElementSibling;
+    
+    if (!errorElement || !errorElement.classList.contains('error-message')) {
+      errorElement = document.createElement('span');
+      errorElement.classList.add('error-message');
+      input.parentNode.insertBefore(errorElement, input.nextSibling);
+    }
+    
+    errorElement.textContent = message;
+  }
+
+  /**
+   * Clear field error state
+   */
+  function clearFieldError(input) {
+    input.classList.remove('field-error');
+    const errorElement = input.nextElementSibling;
+    if (errorElement && errorElement.classList.contains('error-message')) {
+      errorElement.remove();
     }
   }
-  // Check password strength if password field
-  else if (field.type === 'password' && field.value.trim()) {
-    if (field.value.length < 6) {
-      isValid = false;
-      errorMessage = '🏴‍☠️ Avast! That password be too weak for a pirate fortress!';
-    }
-  }
-  // Check minimum length
-  else if (field.minLength && field.value.trim().length < field.minLength) {
-    isValid = false;
-    errorMessage = '🏴‍☠️ Blow me down! Need more characters to plunder the seas properly!';
-  }
 
-  // Display error message if validation fails
-  if (!isValid) {
-    field.classList.add('error');
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'pirate-error';
-    errorDiv.textContent = errorMessage;
-    field.parentElement.insertBefore(errorDiv, field.nextSibling);
-  } else {
-    field.classList.remove('error');
-  }
+  /**
+   * Mobile menu toggle functionality
+   * Criterion 4: Implement responsive mobile menu toggle functionality
+   */
+  function setupMobileMenu() {
+    if (!mobileMenuBtn) return;
 
-  return isValid;
-}
-
-/**
- * Validate entire form
- */
-function validateForm(form) {
-  const inputs = form.querySelectorAll('input, textarea, select');
-  let formIsValid = true;
-
-  inputs.forEach(function(input) {
-    if (!validateField(input)) {
-      formIsValid = false;
-    }
-  });
-
-  return formIsValid;
-}
-
-/**
- * Criterion 4: Mobile Menu Toggle Functionality
- * Implement responsive mobile menu toggle with CSS class manipulation
- */
-function initializeMobileMenuToggle() {
-  // Find menu toggle button
-  const menuToggle = document.querySelector('.menu-toggle, .hamburger-menu, .nav-toggle');
-  const mobileMenu = document.querySelector('nav.mobile-menu, nav');
-
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener('click', function(event) {
-      event.stopPropagation();
-      mobileMenu.classList.toggle('active');
-      menuToggle.classList.toggle('open');
+    mobileMenuBtn.addEventListener('click', function() {
+      const nav = document.querySelector('nav[data-mobile-menu]');
+      if (nav) {
+        nav.classList.toggle('menu-open');
+        mobileMenuBtn.classList.toggle('menu-active');
+      }
     });
 
     // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-      if (!event.target.closest('nav') && !event.target.closest('.menu-toggle') &&
-          !event.target.closest('.hamburger-menu') && !event.target.closest('.nav-toggle')) {
-        if (mobileMenu.classList.contains('active')) {
-          mobileMenu.classList.remove('active');
-          if (menuToggle) menuToggle.classList.remove('open');
-        }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('nav[data-mobile-menu]') && 
+          !e.target.closest('[data-mobile-menu-toggle]')) {
+        closeMobileMenu();
       }
     });
   }
-}
 
-/**
- * Criterion 5: Entrance Animations
- * Add entrance animations by toggling CSS animation classes on page load
- */
-function initializeEntranceAnimations() {
-  // Get all elements with animation classes
-  const elementsWithAnimations = document.querySelectorAll(
-    '[class*="animate"], [class*="fade"], [class*="slide"], [class*="bounce"]'
-  );
+  /**
+   * Close mobile menu
+   */
+  function closeMobileMenu() {
+    const nav = document.querySelector('nav[data-mobile-menu]');
+    if (nav) {
+      nav.classList.remove('menu-open');
+      if (mobileMenuBtn) {
+        mobileMenuBtn.classList.remove('menu-active');
+      }
+    }
+  }
 
-  // Add animation trigger class after a brief delay for smooth entrance
-  elementsWithAnimations.forEach(function(element, index) {
-    setTimeout(function() {
-      element.classList.add('in-view');
-    }, index * 100);
-  });
+  /**
+   * Button click interactions with visual feedback
+   * Criterion 2: Add click handlers for buttons with visual feedback using CSS class toggles
+   */
+  function setupButtonInteractions() {
+    buttons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        // Add active state
+        this.classList.add('btn-active');
+        
+        // Remove active state after animation completes
+        setTimeout(() => {
+          this.classList.remove('btn-active');
+        }, 300);
 
-  // Also implement intersection observer for elements entering viewport during scroll
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-          observer.unobserve(entry.target);
-        }
+        // Add ripple/press effect
+        const ripple = document.createElement('span');
+        ripple.classList.add('btn-ripple');
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
       });
-    }, { threshold: 0.1 });
 
-    // Observe all elements with animation classes
-    elementsWithAnimations.forEach(function(element) {
-      observer.observe(element);
+      // Touch feedback for mobile
+      button.addEventListener('touchstart', function() {
+        this.classList.add('btn-touched');
+      });
+
+      button.addEventListener('touchend', function() {
+        this.classList.remove('btn-touched');
+      });
     });
   }
-}
 
-/**
- * Criterion 6: Hover Effects using CSS Class Manipulation
- * Implement hover effects by toggling CSS classes on interactive elements
- */
-function initializeHoverEffects() {
-  // Target interactive elements: buttons, links, cards, etc.
-  const interactiveSelectors = [
-    'button',
-    'a[href]',
-    '[role="button"]',
-    '.card',
-    '.interactive',
-    'input[type="checkbox"], input[type="radio"]'
-  ];
-
-  const selector = interactiveSelectors.join(', ');
-  const interactiveElements = document.querySelectorAll(selector);
-
-  interactiveElements.forEach(function(element) {
-    // Skip if it's a navigation link (handled by smooth scrolling)
-    if (element.tagName === 'A' && element.getAttribute('href', '').startsWith('#')) {
-      return;
+  /**
+   * Entrance animations on page load
+   * Criterion 5: Add entrance animations by toggling CSS animation classes on page load
+   */
+  function setupEntranceAnimations() {
+    // Animate main app elements on load
+    if (app) {
+      const children = app.querySelectorAll('h1, p, section, article');
+      children.forEach((child, index) => {
+        setTimeout(() => {
+          child.classList.add('entrance-animate');
+        }, index * 100);
+      });
     }
 
-    // Add hover class on mouse enter
-    element.addEventListener('mouseenter', function() {
-      this.classList.add('hover');
+    // Animate interactive elements
+    interactiveElements.forEach((element, index) => {
+      setTimeout(() => {
+        element.classList.add('entrance-animate');
+      }, index * 150);
     });
+  }
 
-    // Remove hover class on mouse leave
-    element.addEventListener('mouseleave', function() {
-      this.classList.remove('hover');
+  /**
+   * Hover effects using CSS class manipulation
+   * Criterion 6: Include hover effects for interactive elements using CSS class manipulation
+   */
+  function setupHoverEffects() {
+    const hoverElements = document.querySelectorAll(
+      'a, button, [data-interactive], .card, [role="button"]'
+    );
+
+    hoverElements.forEach(element => {
+      element.addEventListener('mouseenter', function() {
+        this.classList.add('hover-active');
+      });
+
+      element.addEventListener('mouseleave', function() {
+        this.classList.remove('hover-active');
+      });
+
+      // Mobile equivalent using touch
+      element.addEventListener('touchstart', function() {
+        this.classList.add('touch-active');
+      });
+
+      element.addEventListener('touchend', function() {
+        this.classList.remove('touch-active');
+      });
     });
+  }
 
-    // Support touch devices
-    element.addEventListener('touchstart', function() {
-      this.classList.add('hover');
-    }, { passive: true });
+  /**
+   * Handle window resize for responsive behavior
+   */
+  function handleResize() {
+    if (window.innerWidth > 768) {
+      closeMobileMenu();
+    }
+  }
 
-    element.addEventListener('touchend', function() {
-      this.classList.remove('hover');
-    }, { passive: true });
-  });
-}
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
-// Export functions for testing if needed
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    initializeSmoothScrolling,
-    initializeButtonHandlers,
-    initializeFormValidation,
-    initializeMobileMenuToggle,
-    initializeEntranceAnimations,
-    initializeHoverEffects,
-    validateField,
-    validateForm
+  // Handle window resize
+  window.addEventListener('resize', handleResize);
+
+  // Expose public API for testing/external use
+  window.PirateApp = {
+    validateField: validateField,
+    closeMobileMenu: closeMobileMenu
   };
-}
+
+})();
