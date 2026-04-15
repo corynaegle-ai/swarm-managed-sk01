@@ -448,6 +448,68 @@ button:disabled:hover {
 }
 
 /* ============================================================
+   HOVER INTERACTION CLASSES (Added by JavaScript)
+   ============================================================ */
+
+/* Active hover state for interactive elements */
+.pirate-hover-active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--pirate-shadow);
+  transition: var(--pirate-transition);
+}
+
+/* Link active hover state */
+.pirate-link-active {
+  color: var(--pirate-hover);
+  background-color: rgba(255, 215, 0, 0.1);
+  transition: var(--pirate-transition);
+}
+
+/* Button hover state enhancement */
+.pirate-button-hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--pirate-shadow);
+  transition: var(--pirate-transition);
+}
+
+/* ============================================================
+   THEME SWITCHING INTERACTION CLASSES
+   ============================================================ */
+
+/* Theme switching in progress */
+.pirate-theme-switching {
+  transition: var(--pirate-transition-slow);
+}
+
+/* Mode changing animation state */
+.pirate-mode-changing {
+  transition: var(--pirate-transition-slow);
+}
+
+/* ============================================================
+   ALPINE.JS REACTIVE STATE CLASSES
+   ============================================================ */
+
+/* Loading state for data-bound elements */
+.pirate-loading {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: var(--pirate-transition);
+}
+
+/* Ready state for initialized elements */
+.pirate-ready {
+  opacity: 1;
+  pointer-events: auto;
+  transition: var(--pirate-transition);
+}
+
+/* State changing animation */
+.pirate-state-changing {
+  transition: var(--pirate-transition-slow);
+}
+
+/* ============================================================
    THEME TRANSITION CLASSES (For smooth theme switching)
    ============================================================ */
 
