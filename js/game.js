@@ -39,11 +39,6 @@ class GameState {
       throw new Error(`Player with ID ${playerId} not found`);
     }
 
-    // Check if player's bid was correct
-    if (!this.isBidCorrect(playerId)) {
-      throw new Error('Bonus points can only be set for players who bid correctly');
-    }
-
     player.bonusPoints = amount;
     return player;
   }
