@@ -13,6 +13,9 @@ function trickEntryForm() {
     trickEntries: {},
     validationErrors: [],
     numPlayers: 0,
+    isSubmitting: false,
+    submitMessage: '',
+    submitMessageType: 'success',
 
     /**
      * Initialize the trick entry form for a given round
@@ -25,6 +28,8 @@ function trickEntryForm() {
       this.numPlayers = playerCount;
       this.trickEntries = {};
       this.validationErrors = [];
+      this.isSubmitting = false;
+      this.submitMessage = '';
       
       // Initialize trick entries for each player
       for (let i = 0; i < playerCount; i++) {
@@ -178,23 +183,75 @@ function trickEntryForm() {
     },
 
     /**
-     * Submit trick entry
+     * Submit trick entries and trigger game state update
+     * Saves tricks to game state, calculates scores, and advances round
      */
-    submitTrickEntry() {
+    submitTricks() {
+      // Validate form before submission
       this.validateForm();
       
       if (!this.isFormValid) {
+        this.submitMessage = 'Please fix validation errors before submitting';
+        this.submitMessageType = 'error';
         return;
       }
       
-      // Dispatch custom event with trick data
-      const event = new CustomEvent('tricksSubmitted', {
-        detail: {
-          round: this.currentRound,
-          tricks: this.trickEntries
+      this.isSubmitting = true;
+      this.submitMessage = '';
+
+      try {
+        // Create event with trick data to be saved to game state
+        const trickSubmissionEvent = new CustomEvent('trickSubmission', {
+          detail: {
+            round: this.currentRound,
+            tricks: { ...this.trickEntries },
+            timestamp: new Date().toISOString()
+          },
+          bubbles: true,
+          cancelable: true
+        });
+
+        // Dispatch event for game state manager to intercept
+        const eventDispatched = document.dispatchEvent(trickSubmissionEvent);
+        
+        if (eventDispatched) {
+          // Event was not prevented, show success feedback
+          this.submitMessage = `✓ Tricks submitted successfully for Round ${this.currentRound}`;
+          this.submitMessageType = 'success';
+          
+          // Clear form for next round after brief delay
+          setTimeout(() => {
+            this.trickEntries = {};
+            this.validationErrors = [];
+            this.submitMessage = '';
+            this.isSubmitting = false;
+          }, 2000);
+        } else {
+          // Event was prevented by handler, likely an error
+          this.submitMessage = 'Error submitting tricks. Please try again.';
+          this.submitMessageType = 'error';
+          this.isSubmitting = false;
         }
-      });
-      document.dispatchEvent(event);
+      } catch (error) {
+        console.error('Error submitting tricks:', error);
+        this.submitMessage = `Error: ${error.message}`;
+        this.submitMessageType = 'error';
+        this.isSubmitting = false;
+      }
+    },
+
+    /**
+     * Reset form for a new round
+     * @param {number} roundNum - New round number
+     */
+    resetForNextRound(roundNum) {
+      this.currentRound = roundNum;
+      this.roundNumber = roundNum;
+      this.trickEntries = {};
+      this.validationErrors = [];
+      this.submitMessage = '';
+      this.isSubmitting = false;
+      this.renderTrickInputs();
     }
   };
 }
