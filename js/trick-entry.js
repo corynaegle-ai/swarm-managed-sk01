@@ -1,6 +1,6 @@
 /**
  * Trick Entry Form Controller
- * Manages player trick entry with validation
+ * Manages player trick entry with validation and integration with game state
  */
 
 /**
@@ -39,6 +39,25 @@ function trickEntryForm() {
       }
       
       this.renderTrickInputs();
+      this.setupRoundAdvancedListener();
+    },
+
+    /**
+     * Set up listener for round advanced events from game state manager
+     */
+    setupRoundAdvancedListener() {
+      if (this.roundAdvancedListener) {
+        document.removeEventListener('roundAdvanced', this.roundAdvancedListener);
+      }
+      
+      this.roundAdvancedListener = (event) => {
+        const newRound = event.detail?.currentRound;
+        if (newRound && newRound > this.currentRound) {
+          this.resetForNextRound(newRound);
+        }
+      };
+      
+      document.addEventListener('roundAdvanced', this.roundAdvancedListener);
     },
 
     /**
@@ -208,30 +227,49 @@ function trickEntryForm() {
             timestamp: new Date().toISOString()
           },
           bubbles: true,
-          cancelable: true
+          cancelable: false
         });
 
-        // Dispatch event for game state manager to intercept
-        const eventDispatched = document.dispatchEvent(trickSubmissionEvent);
+        // Dispatch event for game state manager to intercept and process
+        document.dispatchEvent(trickSubmissionEvent);
         
-        if (eventDispatched) {
-          // Event was not prevented, show success feedback
+        // Set up one-time listener for the response from game state manager
+        const handleSuccess = (event) => {
+          document.removeEventListener('trickSubmissionSuccess', handleSuccess);
+          document.removeEventListener('trickSubmissionError', handleError);
+          
           this.submitMessage = `✓ Tricks submitted successfully for Round ${this.currentRound}`;
           this.submitMessageType = 'success';
           
-          // Clear form for next round after brief delay
-          setTimeout(() => {
-            this.trickEntries = {};
-            this.validationErrors = [];
-            this.submitMessage = '';
-            this.isSubmitting = false;
-          }, 2000);
-        } else {
-          // Event was prevented by handler, likely an error
-          this.submitMessage = 'Error submitting tricks. Please try again.';
+          // Form will be reset by the roundAdvanced listener when it fires
+          this.isSubmitting = false;
+        };
+        
+        const handleError = (event) => {
+          document.removeEventListener('trickSubmissionSuccess', handleSuccess);
+          document.removeEventListener('trickSubmissionError', handleError);
+          
+          this.submitMessage = `Error: ${event.detail?.message || 'Failed to submit tricks'}`;
           this.submitMessageType = 'error';
           this.isSubmitting = false;
-        }
+        };
+        
+        // Listen for game state response
+        document.addEventListener('trickSubmissionSuccess', handleSuccess);
+        document.addEventListener('trickSubmissionError', handleError);
+        
+        // Set a timeout in case no response comes back (e.g., game not initialized)
+        setTimeout(() => {
+          if (this.isSubmitting) {
+            document.removeEventListener('trickSubmissionSuccess', handleSuccess);
+            document.removeEventListener('trickSubmissionError', handleError);
+            
+            this.submitMessage = 'Error: No response from game state. Please initialize the game first.';
+            this.submitMessageType = 'error';
+            this.isSubmitting = false;
+          }
+        }, 3000);
+        
       } catch (error) {
         console.error('Error submitting tricks:', error);
         this.submitMessage = `Error: ${error.message}`;
