@@ -20,6 +20,31 @@
                 <!-- Trick input fields will be dynamically generated here -->
             </div>
             
+            <!-- Bonus points section -->
+            <div style="margin-top: 1.5rem; border-top: 1px solid #e0e0e0; padding-top: 1.5rem;">
+                <h3 style="margin-top: 0; margin-bottom: 1rem;">Bonus Points</h3>
+                <template x-for="player in players" :key="player.id">
+                    <div x-show="isBidCorrect(player.id)" style="margin-bottom: 1rem; padding: 1rem; background-color: #f5f5f5; border-radius: 4px;">
+                        <label 
+                            :for="'bonus-' + player.id" 
+                            style="display: block; margin-bottom: 0.5rem; font-weight: 500;"
+                        >
+                            <span x-text="player.name"></span> - Bonus Points:
+                        </label>
+                        <input 
+                            :id="'bonus-' + player.id"
+                            type="number" 
+                            min="0" 
+                            :value="player.bonusPoints || 0"
+                            @input="updateBonusPoints(player.id, $event.target.value)"
+                            style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem;"
+                            placeholder="Enter bonus points"
+                        />
+                        <small style="display: block; margin-top: 0.25rem; color: #666;" x-text="player.name + ' bid correctly and is eligible for bonus points'"></small>
+                    </div>
+                </template>
+            </div>
+            
             <div id="validation-errors" x-show="validationErrors.length > 0" style="display:none; margin-top: 1rem;">
                 <div style="color: #d32f2f; background-color: #ffebee; padding: 1rem; border-radius: 4px; border-left: 4px solid #d32f2f;">
                     <h3 style="margin-top: 0; margin-bottom: 0.5rem;">Validation Errors:</h3>
@@ -46,6 +71,7 @@
             </div>
         </form>
     </div>
+    <script src="js/game.js"></script>
     <script src="js/scoreboardUI.js"></script>
     <script src="js/trick-entry.js"></script>
     <script src="app.js"></script>
