@@ -3,6 +3,39 @@
  * Handles game state, round management, and scoreboard integration
  */
 
+// Pirate-themed styles for scoreboard button
+const style = document.createElement('style');
+style.textContent = `
+  .pirate-btn {
+    background-color: #8B4513;
+    color: #FFD700;
+    border: 2px solid #DAA520;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .pirate-btn:hover {
+    background-color: #A0522D;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+  
+  .pirate-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+`;
+if (document.head) {
+  document.head.appendChild(style);
+}
+
 // Game state management
 const gameState = {
   players: [
@@ -69,13 +102,21 @@ function displayScoreboard() {
     maxRounds: gameState.maxRounds
   };
 
-  // Clear previous content
+  // Clear previous content and remove existing listeners
   scoreboardContainer.innerHTML = '';
   scoreboardContainer.style.display = 'block';
 
   // Create scoreboard using scoreboardUI module
   if (typeof ScoreboardUI !== 'undefined' && ScoreboardUI.createScoreboard) {
     const scoreboardElement = ScoreboardUI.createScoreboard(scoreboardData);
+    // Ensure close button exists or add it
+    if (!scoreboardElement.querySelector('#close-scoreboard')) {
+      const closeBtn = document.createElement('button');
+      closeBtn.id = 'close-scoreboard';
+      closeBtn.className = 'close-btn';
+      closeBtn.textContent = '×';
+      scoreboardElement.insertBefore(closeBtn, scoreboardElement.firstChild);
+    }
     scoreboardContainer.appendChild(scoreboardElement);
   } else {
     // Fallback: Create a basic scoreboard if module not available
@@ -83,7 +124,7 @@ function displayScoreboard() {
     scoreboardContainer.innerHTML = scoreboardHTML;
   }
 
-  // Add close button functionality
+  // Add close button functionality (only once, after clearing previous listeners)
   addScoreboardCloseHandler(scoreboardContainer);
 
   // Update state
@@ -126,15 +167,22 @@ function addScoreboardCloseHandler(container) {
   const closeBtn = container.querySelector('#close-scoreboard');
   
   if (closeBtn) {
-    closeBtn.addEventListener('click', hideScoreboard);
+    // Remove previous listeners to prevent accumulation
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+    newCloseBtn.addEventListener('click', hideScoreboard);
   }
   
-  // Also allow clicking outside the scoreboard to close it
-  container.addEventListener('click', function(e) {
+  // Create a reusable click handler for outside clicks
+  const handleOutsideClick = function(e) {
     if (e.target === container) {
       hideScoreboard();
     }
-  });
+  };
+  
+  // Remove old listeners and add new one
+  container.removeEventListener('click', handleOutsideClick);
+  container.addEventListener('click', handleOutsideClick);
 }
 
 /**
