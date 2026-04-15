@@ -3,7 +3,7 @@
     class="scoreboard-button"
     @click="toggleScoreboard"
     :aria-pressed="isScoreboardOpen"
-    aria-label="Toggle scoreboard display"
+    aria-label="Shiver me timbers! View the pirate crew standings"
     title="View current game standings"
   >
     <span class="button-icon">📊</span>

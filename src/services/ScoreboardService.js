@@ -32,7 +32,7 @@ class ScoreboardService {
    * @returns {number} Total score
    */
   getTotalScore(player) {
-    return player?.totalScore || 0;
+    return player?.totalScore ?? 0;
   }
 
   /**
@@ -132,7 +132,7 @@ class ScoreboardService {
    */
   getRoundScore(player, roundIndex) {
     const roundScores = this.getRoundScores(player);
-    return roundScores[roundIndex] || 0;
+    return roundScores[roundIndex] ?? 0;
   }
 }
 
