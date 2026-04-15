@@ -1,0 +1,416 @@
+/* ============================================================
+   PIRATE THEME - CSS Variables and Base Styles
+   ============================================================ */
+
+:root {
+  /* Light Mode Colors */
+  --pirate-primary: #8B4513;        /* Saddle Brown */
+  --pirate-secondary: #FFD700;       /* Gold */
+  --pirate-accent: #DC143C;          /* Crimson */
+  --pirate-bg-light: #FFF8DC;        /* Cornsilk */
+  --pirate-text-light: #1a1a1a;      /* Dark text */
+  --pirate-border: #8B4513;          /* Brown border */
+  --pirate-hover: #A0522D;           /* Sienna */
+  --pirate-shadow: rgba(0, 0, 0, 0.2);
+  
+  /* Dark Mode Colors */
+  --pirate-primary-dark: #1a1a1a;    /* Very Dark */
+  --pirate-secondary-dark: #FFD700;  /* Gold (same) */
+  --pirate-accent-dark: #FF6347;     /* Tomato */
+  --pirate-bg-dark: #0D0D0D;         /* Almost Black */
+  --pirate-text-dark: #FFF8DC;       /* Light text */
+  --pirate-border-dark: #FFD700;     /* Gold border */
+  --pirate-hover-dark: #FF8C00;      /* Dark Orange */
+  --pirate-shadow-dark: rgba(255, 215, 0, 0.1);
+  
+  /* Transitions */
+  --pirate-transition: all 0.3s ease;
+  --pirate-transition-slow: all 0.6s ease;
+}
+
+/* ============================================================
+   LIGHT MODE (Default)
+   ============================================================ */
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Georgia', serif;
+  background-color: var(--pirate-bg-light);
+  color: var(--pirate-text-light);
+  transition: var(--pirate-transition);
+  line-height: 1.6;
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  transition: var(--pirate-transition);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--pirate-primary);
+  text-shadow: 2px 2px 4px var(--pirate-shadow);
+  transition: var(--pirate-transition);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+p {
+  color: var(--pirate-text-light);
+  transition: var(--pirate-transition);
+}
+
+a {
+  color: var(--pirate-primary);
+  text-decoration: none;
+  border-bottom: 2px solid var(--pirate-secondary);
+  transition: var(--pirate-transition);
+  cursor: pointer;
+}
+
+a:hover {
+  color: var(--pirate-hover);
+  background-color: rgba(255, 215, 0, 0.1);
+  padding: 0 4px;
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+:root.pirate-dark-mode {
+  --pirate-primary: var(--pirate-primary-dark);
+  --pirate-secondary: var(--pirate-secondary-dark);
+  --pirate-accent: var(--pirate-accent-dark);
+  --pirate-bg-light: var(--pirate-bg-dark);
+  --pirate-text-light: var(--pirate-text-dark);
+  --pirate-border: var(--pirate-border-dark);
+  --pirate-hover: var(--pirate-hover-dark);
+  --pirate-shadow: var(--pirate-shadow-dark);
+}
+
+:root.pirate-dark-mode body,
+:root.pirate-dark-mode html {
+  background-color: var(--pirate-bg-dark);
+  color: var(--pirate-text-dark);
+}
+
+:root.pirate-dark-mode a {
+  border-bottom-color: var(--pirate-secondary-dark);
+}
+
+:root.pirate-dark-mode a:hover {
+  background-color: rgba(255, 215, 0, 0.15);
+}
+
+/* ============================================================
+   SAILING MODE - Animated Effects
+   ============================================================ */
+
+:root.pirate-sailing h1,
+:root.pirate-sailing h2,
+:root.pirate-sailing h3 {
+  animation: wave 3s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+:root.pirate-sailing #app {
+  animation: gentle-sway 4s ease-in-out infinite;
+}
+
+@keyframes gentle-sway {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN - Mobile, Tablet, Desktop
+   ============================================================ */
+
+/* Mobile (< 768px) */
+@media (max-width: 767px) {
+  #app {
+    padding: 1rem;
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  #app {
+    padding: 1.5rem;
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+}
+
+/* Desktop (>= 1024px) */
+@media (min-width: 1024px) {
+  #app {
+    padding: 2rem;
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+}
+
+/* ============================================================
+   INTERACTIVE ELEMENTS - Hover Effects
+   ============================================================ */
+
+/* Anchor Link Hover State */
+a[data-pirate-anchor] {
+  position: relative;
+  transition: var(--pirate-transition);
+}
+
+a[data-pirate-anchor]::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--pirate-secondary);
+  transition: width 0.3s ease;
+}
+
+a[data-pirate-anchor]:hover::after {
+  width: 100%;
+}
+
+a.pirate-anchor-hovered {
+  color: var(--pirate-hover);
+  font-weight: 500;
+}
+
+/* Button Styles */
+button {
+  background-color: var(--pirate-primary);
+  color: var(--pirate-bg-light);
+  border: 2px solid var(--pirate-border);
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Georgia', serif;
+  font-size: 14px;
+  transition: var(--pirate-transition);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+button:hover {
+  background-color: var(--pirate-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--pirate-shadow);
+}
+
+button:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px var(--pirate-shadow);
+}
+
+/* Theme Toggle Button */
+button[data-theme-toggle],
+button[x-on\:click="toggleTheme"] {
+  background-color: var(--pirate-secondary);
+  color: var(--pirate-primary);
+  border-color: var(--pirate-secondary);
+}
+
+button[data-theme-toggle]:hover,
+button[x-on\:click="toggleTheme"]:hover {
+  background-color: #FFC700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Sailing Mode Button */
+button[data-sailing-toggle],
+button[x-on\:click="toggleSailingMode"] {
+  background-color: var(--pirate-accent);
+  color: #FFFFFF;
+  border-color: var(--pirate-accent);
+}
+
+button[data-sailing-toggle]:hover,
+button[x-on\:click="toggleSailingMode"]:hover {
+  background-color: #FF4500;
+}
+
+/* ============================================================
+   TRANSITION AND ANIMATION HELPERS
+   ============================================================ */
+
+.pirate-smooth-transition {
+  transition: var(--pirate-transition-slow);
+}
+
+.pirate-fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pirate-fade-out {
+  animation: fadeOut 0.5s ease-out;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.pirate-scale-up {
+  animation: scaleUp 0.3s ease;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   LIGHT MODE EXPLICIT CLASS
+   ============================================================ */
+
+:root.pirate-light-mode {
+  --pirate-primary: #8B4513;
+  --pirate-secondary: #FFD700;
+  --pirate-accent: #DC143C;
+  --pirate-bg-light: #FFF8DC;
+  --pirate-text-light: #1a1a1a;
+  --pirate-border: #8B4513;
+  --pirate-hover: #A0522D;
+  --pirate-shadow: rgba(0, 0, 0, 0.2);
+}
+
+:root.pirate-light-mode body,
+:root.pirate-light-mode html {
+  background-color: #FFF8DC;
+  color: #1a1a1a;
+}
+
+/* ============================================================
+   INTERACTIVE STATES - JS-Managed Classes
+   ============================================================ */
+
+/* Hover state for interactive elements */
+.pirate-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--pirate-shadow);
+}
+
+/* Active/pressed state */
+.pirate-interactive:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px var(--pirate-shadow);
+}
+
+/* State for sailing mode active */
+.pirate-sailing-active button[data-sailing-toggle],
+.pirate-sailing-active button[x-on\:click="toggleSailingMode"] {
+  background-color: #FF4500;
+  box-shadow: 0 0 12px rgba(255, 69, 0, 0.4);
+}
+
+/* State for dark mode active */
+.pirate-dark-active button[data-theme-toggle],
+.pirate-dark-active button[x-on\:click="toggleTheme"] {
+  background-color: #FFC700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* ============================================================
+   ACCESSIBILITY & PRINT STYLES
+   ============================================================ */
+
+@media print {
+  body,
+  html {
+    background-color: #FFFFFF;
+    color: #000000;
+  }
+  
+  a {
+    color: #000000;
+    border-bottom: 1px solid #000000;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
