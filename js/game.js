@@ -1,268 +1,210 @@
 /**
- * Game State Manager
- * Manages overall game state, scoring, and round progression
+ * Game State Management Module
+ * Manages game state including player bids, tricks, and scores
+ * Integrates with the scoring engine for score calculations
  */
 
-class GameStateManager {
-  constructor() {
-    this.gameState = {
-      players: [],
-      currentRound: 1,
-      maxRounds: 13,
-      gameActive: false
-    };
-    
-    this.isInitialized = false;
-    this.setupEventListeners();
-  }
+import { calculateScore } from './scoring.js';
 
-  /**
-   * Initialize game with players and game settings
-   * @param {Array} players - Array of player objects with name, bid, and tricks properties
-   * @param {number} maxRounds - Maximum number of rounds (default 13)
-   */
-  initializeGame(players, maxRounds = 13) {
-    if (!players || players.length === 0) {
-      throw new Error('At least one player is required to initialize the game');
-    }
-    
-    this.gameState.players = players.map((player, index) => ({
-      id: `player${index}`,
-      name: player.name || `Player ${index + 1}`,
-      bid: player.bid || 0,
-      tricks: 0,
-      score: 0,
-      roundScores: [],
-      ...player
-    }));
-    
-    this.gameState.maxRounds = maxRounds;
-    this.gameState.currentRound = 1;
-    this.gameState.gameActive = true;
-    this.isInitialized = true;
-    
-    console.log('Game initialized with players:', this.gameState.players);
-    console.log('Max rounds:', this.gameState.maxRounds);
-  }
+/**
+ * Game state object
+ * Tracks all game-related data
+ */
+const gameState = {
+  players: [],
+  currentRound: 1,
+  totalRounds: 13,
+  bids: {},        // { playerId: bidAmount }
+  tricks: {},      // { playerId: tricksWon }
+  scores: {},      // { playerId: currentRoundScore }
+  totalScores: {}, // { playerId: totalScore }
+};
 
-  /**
-   * Set up event listeners for game flow
-   */
-  setupEventListeners() {
-    // Listen for trick submission events from trick-entry.js
-    document.addEventListener('trickSubmission', (event) => {
-      this.handleTrickSubmission(event);
-    });
-  }
-
-  /**
-   * Handle trick submission event
-   * @param {CustomEvent} event - Event containing trick data
-   */
-  handleTrickSubmission(event) {
-    try {
-      const { round, tricks } = event.detail;
-      
-      if (!this.isInitialized) {
-        console.error('Game not initialized. Cannot process trick submission.');
-        this.dispatchGameEvent('trickSubmissionError', {
-          error: 'Game not initialized',
-          message: 'Please initialize the game first'
-        });
-        return;
-      }
-      
-      if (round !== this.gameState.currentRound) {
-        console.error(`Round mismatch: expected ${this.gameState.currentRound}, got ${round}`);
-        this.dispatchGameEvent('trickSubmissionError', {
-          error: 'Round mismatch',
-          message: `Expected round ${this.gameState.currentRound}. Please refresh.`
-        });
-        return;
-      }
-      
-      // Update player scores based on tricks taken vs bid
-      this.updatePlayerScores(tricks);
-      
-      // Advance to next round
-      this.advanceRound();
-      
-      // Dispatch success event so UI can respond
-      this.dispatchGameEvent('trickSubmissionSuccess', {
-        round: this.gameState.currentRound - 1,
-        currentRound: this.gameState.currentRound,
-        scores: this.getPlayerScores()
-      });
-      
-    } catch (error) {
-      console.error('Error processing trick submission:', error);
-      this.dispatchGameEvent('trickSubmissionError', {
-        error: error.message,
-        message: 'An error occurred while processing tricks'
-      });
-    }
-  }
-
-  /**
-   * Update player scores based on tricks taken vs bids
-   * Calculates points: 10 points if tricks match bid, otherwise -|tricks - bid| points
-   * @param {Object} tricks - Object with keys 'player0', 'player1', etc., values are tricks taken
-   */
-  updatePlayerScores(tricks) {
-    if (!tricks || typeof tricks !== 'object') {
-      throw new Error('Invalid tricks object provided to updatePlayerScores');
-    }
-    
-    for (let i = 0; i < this.gameState.players.length; i++) {
-      const playerId = `player${i}`;
-      const player = this.gameState.players[i];
-      const tricksTaken = tricks[playerId];
-      
-      if (tricksTaken === undefined || tricksTaken === null) {
-        throw new Error(`Missing tricks entry for ${playerId}`);
-      }
-      
-      // Calculate round points
-      let roundPoints = 0;
-      if (tricksTaken === player.bid) {
-        // Bonus points if tricks match bid
-        roundPoints = 10;
-      } else {
-        // Penalty for not matching bid: -|tricks - bid|
-        roundPoints = -(Math.abs(tricksTaken - player.bid));
-      }
-      
-      // Update player's tricks for this round
-      player.tricks = tricksTaken;
-      
-      // Update total score
-      player.score += roundPoints;
-      
-      // Track round scores
-      if (!player.roundScores) {
-        player.roundScores = [];
-      }
-      player.roundScores.push({
-        round: this.gameState.currentRound,
-        bid: player.bid,
-        tricks: tricksTaken,
-        points: roundPoints
-      });
-      
-      console.log(`Player ${i+1} (${player.name}): Bid=${player.bid}, Tricks=${tricksTaken}, Points=${roundPoints}, Total=${player.score}`);
-    }
-  }
-
-  /**
-   * Advance to the next round
-   * @returns {boolean} True if game continues, false if game ended
-   */
-  advanceRound() {
-    if (!this.gameState.gameActive) {
-      console.warn('Game is not active. Cannot advance round.');
-      return false;
-    }
-    
-    // Reset bids and tricks for next round
-    for (const player of this.gameState.players) {
-      player.bid = 0;
-      player.tricks = 0;
-    }
-    
-    // Move to next round
-    this.gameState.currentRound += 1;
-    
-    // Check if game ended
-    if (this.gameState.currentRound > this.gameState.maxRounds) {
-      this.gameState.gameActive = false;
-      console.log('Game ended. Final scores:', this.getPlayerScores());
-      return false;
-    }
-    
-    console.log(`Advanced to round ${this.gameState.currentRound}`);
-    return true;
-  }
-
-  /**
-   * Get current scores for all players
-   * @returns {Array} Array of player score objects
-   */
-  getPlayerScores() {
-    return this.gameState.players.map(player => ({
-      id: player.id,
-      name: player.name,
-      score: player.score,
-      bid: player.bid,
-      tricks: player.tricks
-    }));
-  }
-
-  /**
-   * Get results for a specific round
-   * @param {number} round - Round number (defaults to currentRound - 1 for last completed round)
-   * @returns {Array} Array of round results
-   */
-  getRoundResults(round = null) {
-    const targetRound = round !== null ? round : this.gameState.currentRound - 1;
-    
-    return this.gameState.players.map(player => {
-      const roundScore = player.roundScores?.find(rs => rs.round === targetRound);
-      return {
-        playerId: player.id,
-        playerName: player.name,
-        bid: roundScore?.bid || 0,
-        tricks: roundScore?.tricks || 0,
-        points: roundScore?.points || 0
-      };
-    });
-  }
-
-  /**
-   * Dispatch custom game event
-   * @param {string} eventName - Name of the event
-   * @param {Object} detail - Event detail data
-   */
-  dispatchGameEvent(eventName, detail) {
-    const event = new CustomEvent(eventName, {
-      detail,
-      bubbles: true,
-      cancelable: true
-    });
-    document.dispatchEvent(event);
-  }
-
-  /**
-   * Get current game state
-   * @returns {Object} Current game state
-   */
-  getGameState() {
-    return {
-      ...this.gameState,
-      players: this.gameState.players.map(p => ({ ...p }))
-    };
-  }
-
-  /**
-   * Check if game is active
-   * @returns {boolean} True if game is active
-   */
-  isGameActive() {
-    return this.gameState.gameActive && this.gameState.currentRound <= this.gameState.maxRounds;
-  }
-
-  /**
-   * Get current round number
-   * @returns {number} Current round
-   */
-  getCurrentRound() {
-    return this.gameState.currentRound;
-  }
+/**
+ * Initialize game with players
+ * @param {Array} players - Array of player objects with id and name
+ */
+export function initializeGame(players) {
+  gameState.players = players;
+  gameState.bids = {};
+  gameState.tricks = {};
+  gameState.scores = {};
+  gameState.totalScores = {};
+  
+  // Initialize player scores to 0
+  players.forEach(player => {
+    gameState.totalScores[player.id] = 0;
+    gameState.bids[player.id] = null;
+    gameState.tricks[player.id] = 0;
+    gameState.scores[player.id] = 0;
+  });
+  
+  gameState.currentRound = 1;
+  return gameState;
 }
 
-// Create singleton instance
-const gameStateManager = new GameStateManager();
+/**
+ * Record a player's bid for the current round
+ * @param {string} playerId - Player ID
+ * @param {number} bidAmount - Number of tricks player is bidding
+ * @returns {boolean} Success status
+ */
+export function setBid(playerId, bidAmount) {
+  if (typeof bidAmount !== 'number' || bidAmount < 0) {
+    console.error('Invalid bid amount:', bidAmount);
+    return false;
+  }
+  
+  gameState.bids[playerId] = bidAmount;
+  return true;
+}
 
-// Export for use in modules and testing
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { GameStateManager, gameStateManager };
+/**
+ * Record tricks won by a player in the current round
+ * @param {string} playerId - Player ID
+ * @param {number} tricksWon - Number of tricks won
+ * @returns {boolean} Success status
+ */
+export function setTricks(playerId, tricksWon) {
+  if (typeof tricksWon !== 'number' || tricksWon < 0) {
+    console.error('Invalid tricks count:', tricksWon);
+    return false;
+  }
+  
+  gameState.tricks[playerId] = tricksWon;
+  return true;
+}
+
+/**
+ * Get a player's score for the current round
+ * @param {string} playerId - Player ID
+ * @returns {number} Player's score for current round
+ */
+export function getPlayerScore(playerId) {
+  return gameState.scores[playerId] || 0;
+}
+
+/**
+ * Update a player's score
+ * @param {string} playerId - Player ID
+ * @param {number} scoreValue - Score to set
+ * @returns {boolean} Success status
+ */
+export function updatePlayerScore(playerId, scoreValue) {
+  if (typeof scoreValue !== 'number') {
+    console.error('Invalid score value:', scoreValue);
+    return false;
+  }
+  
+  gameState.scores[playerId] = scoreValue;
+  gameState.totalScores[playerId] = (gameState.totalScores[playerId] || 0) + scoreValue;
+  return true;
+}
+
+/**
+ * Calculate scores for all players in the current round
+ * Uses the scoring engine to determine points based on bid vs tricks
+ * @returns {Object} Object with playerId as key and score as value
+ */
+export function calculateRoundScores() {
+  const roundScores = {};
+  
+  gameState.players.forEach(player => {
+    const bid = gameState.bids[player.id];
+    const tricks = gameState.tricks[player.id];
+    
+    // Validate that both bid and tricks are set
+    if (bid === null || bid === undefined || tricks === null || tricks === undefined) {
+      console.warn(`Missing bid or tricks for player ${player.id}`);
+      roundScores[player.id] = 0;
+      return;
+    }
+    
+    // Use the scoring engine to calculate the score
+    const score = calculateScore(bid, tricks);
+    roundScores[player.id] = score;
+    
+    // Update the game state with the calculated score
+    updatePlayerScore(player.id, score);
+  });
+  
+  return roundScores;
+}
+
+/**
+ * Get all player total scores
+ * @returns {Object} Object with playerId as key and total score as value
+ */
+export function getTotalScores() {
+  return { ...gameState.totalScores };
+}
+
+/**
+ * Get the current game state
+ * @returns {Object} Copy of the current game state
+ */
+export function getGameState() {
+  return { ...gameState };
+}
+
+/**
+ * Reset game for a new round
+ * Clears bids and tricks, increments round counter
+ * @returns {boolean} Success status
+ */
+export function startNewRound() {
+  if (gameState.currentRound >= gameState.totalRounds) {
+    console.warn('All rounds completed');
+    return false;
+  }
+  
+  gameState.currentRound++;
+  gameState.bids = {};
+  gameState.tricks = {};
+  gameState.scores = {};
+  
+  // Re-initialize bids and tricks for new round
+  gameState.players.forEach(player => {
+    gameState.bids[player.id] = null;
+    gameState.tricks[player.id] = 0;
+    gameState.scores[player.id] = 0;
+  });
+  
+  return true;
+}
+
+/**
+ * Check if all players have placed their bids
+ * @returns {boolean} True if all bids are set
+ */
+export function allBidsPlaced() {
+  return gameState.players.every(player => 
+    gameState.bids[player.id] !== null && gameState.bids[player.id] !== undefined
+  );
+}
+
+/**
+ * Check if all players have reported their tricks
+ * @returns {boolean} True if all tricks are set
+ */
+export function allTricksReported() {
+  return gameState.players.every(player => 
+    gameState.tricks[player.id] !== null && gameState.tricks[player.id] !== undefined
+  );
+}
+
+/**
+ * Get the current round number
+ * @returns {number} Current round number
+ */
+export function getCurrentRound() {
+  return gameState.currentRound;
+}
+
+/**
+ * Check if game is complete
+ * @returns {boolean} True if all rounds have been played
+ */
+export function isGameComplete() {
+  return gameState.currentRound > gameState.totalRounds;
 }
