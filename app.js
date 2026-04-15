@@ -1,53 +1,36 @@
 /**
  * Main application entry point
- * Initializes app state and sets up event listeners
+ * Initializes the vanilla JS app with state management and event handling
  */
 
-// Application state
-const appState = {
-    initialized: false,
-    version: '1.0.0',
-    debug: true
-};
+(function() {
+    'use strict';
 
-/**
- * Initialize the application
- */
-function initializeApp() {
-    try {
-        if (appState.debug) {
-            console.log('Initializing app...', appState.version);
+    // Application state
+    const appState = {
+        initialized: false,
+        version: '1.0.0'
+    };
+
+    /**
+     * Initialize the application
+     */
+    function init() {
+        try {
+            console.log('Initializing Vanilla JS App v' + appState.version);
+            appState.initialized = true;
+            console.log('Application initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize application:', error);
         }
-
-        // Verify DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupApp);
-        } else {
-            setupApp();
-        }
-    } catch (error) {
-        console.error('Error during app initialization:', error);
-        throw error;
-    }
-}
-
-/**
- * Setup application components and listeners
- */
-function setupApp() {
-    const appElement = document.getElementById('app');
-    
-    if (!appElement) {
-        throw new Error('App container element not found');
     }
 
-    // Mark app as initialized
-    appState.initialized = true;
-
-    if (appState.debug) {
-        console.log('App setup complete and ready for use');
+    /**
+     * Run initialization when DOM is ready
+     */
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
-}
-
-// Initialize app when script loads
-initializeApp();
+})();
