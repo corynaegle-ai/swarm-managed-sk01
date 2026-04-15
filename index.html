@@ -3,150 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vanilla JS App</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/scoreboard.css">
+    <meta name="description" content="Pirate-themed adventure website with treasure hunts and seafaring tales">
+    <meta name="keywords" content="pirate, treasure, adventure, seafaring">
+    <meta name="author" content="Pirate Swarm">
+    <title>Pirate Adventures - Treasure Awaits</title>
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
-    <div id="app" x-data="appState()">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-            <h1>Welcome to Vanilla JS App</h1>
-            <button 
-                @click="scoreboardVisible = !scoreboardVisible" 
-                class="pirate-btn"
-                style="padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; background: linear-gradient(135deg, #8B4513, #D2691E); color: white; border: 2px solid #654321; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); transition: all 0.3s ease;"
-                @mouseover="$el.style.background='linear-gradient(135deg, #A0522D, #FF8C00)'"
-                @mouseout="$el.style.background='linear-gradient(135deg, #8B4513, #D2691E)'"
-            >
-                ☠️ <span x-text="scoreboardVisible ? 'Hide' : 'Show'"></span> Scoreboard
-            </button>
-        </div>
-        <p>Application ready for development</p>
-        
-        <!-- Scoreboard Panel -->
-        <div x-show="scoreboardVisible" style="margin-top: 2rem;" class="scoreboard-container">
-            <div class="treasure-chest-header">
-                <h2 style="margin: 0; display: flex; align-items: center; gap: 0.75rem;">
-                    <span class="treasure-icon">🗂️</span>
-                    Player Standings
-                    <span class="treasure-icon">🗂️</span>
-                </h2>
-            </div>
-            
-            <div class="scoreboard-wrapper">
-                <table class="scoreboard-table" role="grid">
-                    <thead>
-                        <tr class="scoreboard-header-row">
-                            <th style="text-align: left; padding: 1rem; border-bottom: 3px solid #DAA520;">Player Name</th>
-                            <template x-for="(round, index) in rounds" :key="index">
-                                <th style="text-align: center; padding: 1rem; border-bottom: 3px solid #DAA520; min-width: 80px;" :title="'Round ' + (index + 1)">R<span x-text="index + 1"></span></th>
-                            </template>
-                            <th style="text-align: center; padding: 1rem; border-bottom: 3px solid #DAA520; font-weight: bold; background-color: #2c2410; min-width: 100px;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template x-for="(player, playerIndex) in players" :key="playerIndex">
-                            <tr class="scoreboard-row" :style="playerIndex % 2 === 0 ? 'background-color: rgba(139, 69, 19, 0.1);' : ''">
-                                <td style="padding: 1rem; text-align: left; font-weight: bold; color: #333;">
-                                    <span class="player-rank" x-text="playerIndex + 1"></span>
-                                    <span x-text="player.name"></span>
-                                </td>
-                                <template x-for="(round, roundIndex) in rounds" :key="roundIndex">
-                                    <td style="text-align: center; padding: 1rem; color: #333;" :class="{'round-zero': player.roundScores[roundIndex] === 0}">
-                                        <span x-text="player.roundScores[roundIndex]"></span>
-                                    </td>
-                                </template>
-                                <td style="text-align: center; padding: 1rem; font-weight: bold; font-size: 1.1em; color: #DAA520; background-color: rgba(218, 165, 32, 0.1);">
-                                    <span x-text="player.totalScore"></span>
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="scoreboard-footer">
-                <p style="margin: 0; font-size: 0.9em; color: #666;">
-                    <span style="display: inline-block; margin-right: 1.5rem;">📊 Total Players: <strong x-text="players.length"></strong></span>
-                    <span style="display: inline-block;">🎯 Total Rounds: <strong x-text="rounds.length"></strong></span>
-                </p>
-            </div>
-        </div>
-    </div>
-    
-    <div id="trick-entry-form" x-data="trickEntryForm()" style="display:none;">
-        <h2>Enter Tricks for Round <span x-text="currentRound"></span></h2>
-        <form @submit.prevent="submitTrickEntry">
-            <div id="trick-inputs">
-                <!-- Trick input fields will be dynamically generated here -->
-            </div>
-            
-            <div id="validation-errors" x-show="validationErrors.length > 0" style="display:none; margin-top: 1rem;">
-                <div style="color: #d32f2f; background-color: #ffebee; padding: 1rem; border-radius: 4px; border-left: 4px solid #d32f2f;">
-                    <h3 style="margin-top: 0; margin-bottom: 0.5rem;">Validation Errors:</h3>
-                    <ul style="margin: 0; padding-left: 1.5rem;">
-                        <template x-for="error in validationErrors" :key="error">
-                            <li x-text="error" style="margin-bottom: 0.25rem;"></li>
-                        </template>
-                    </ul>
+    <div x-data="themeData()">
+        <!-- Navigation Section -->
+        <nav class="nav-pirate bg-gray-900 sticky top-0 z-50 shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">⚓</span>
+                    <span class="text-xl font-bold text-amber-200">Pirate Quest</span>
                 </div>
-            </div>
-            
-            <div style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-size: 1.1rem;">
-                    <strong>Remaining Tricks:</strong> <span x-text="remainingTricks" style="font-size: 1.2rem; color: #1976d2;"></span>
-                </div>
-                <button 
-                    type="submit" 
-                    x-bind:disabled="!isFormValid" 
-                    style="padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer;"
-                    :style="!isFormValid && 'opacity: 0.5; cursor: not-allowed;'"
-                >
-                    Submit Tricks
+                <ul class="hidden md:flex space-x-6">
+                    <li><a href="#home" class="text-amber-200 hover:text-amber-100 transition">Home</a></li>
+                    <li><a href="#adventures" class="text-amber-200 hover:text-amber-100 transition">Adventures</a></li>
+                    <li><a href="#treasures" class="text-amber-200 hover:text-amber-100 transition">Treasures</a></li>
+                    <li><a href="#contact" class="text-amber-200 hover:text-amber-100 transition">Contact</a></li>
+                </ul>
+                <button class="md:hidden text-amber-200" @click="menuOpen = !menuOpen">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
                 </button>
             </div>
-        </form>
+            <!-- Mobile Menu -->
+            <div x-show="menuOpen" class="md:hidden bg-gray-800 px-4 py-4">
+                <ul class="space-y-3">
+                    <li><a href="#home" class="text-amber-200 hover:text-amber-100 transition block">Home</a></li>
+                    <li><a href="#adventures" class="text-amber-200 hover:text-amber-100 transition block">Adventures</a></li>
+                    <li><a href="#treasures" class="text-amber-200 hover:text-amber-100 transition block">Treasures</a></li>
+                    <li><a href="#contact" class="text-amber-200 hover:text-amber-100 transition block">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header id="home" class="hero-pirate bg-gradient-to-b from-gray-800 to-gray-900 py-20 px-4 text-center">
+            <div class="container mx-auto">
+                <h1 class="text-4xl md:text-6xl font-pirata font-bold text-amber-300 mb-4">
+                    Welcome to the Pirate Realm
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mb-8">
+                    Set sail for adventure, hunt for treasure, and join the legendary pirate crew
+                </p>
+                <button class="btn-pirate btn-treasure px-8 py-3 rounded-lg font-bold uppercase tracking-wider">
+                    Start Your Quest
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="container mx-auto px-4 py-16">
+            <!-- Adventures Section -->
+            <section id="adventures" class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-300 mb-12 text-center">
+                    Epic Adventures Await
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <article class="card-pirate rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
+                        <div class="bg-gradient-to-r from-amber-700 to-amber-900 h-40 flex items-center justify-center">
+                            <span class="text-5xl">🏴‍☠️</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-300 mb-3">Cursed Seas</h3>
+                            <p class="text-gray-300 mb-4">
+                                Navigate through haunted waters and battle fearsome sea creatures to claim the legendary cursed treasure.
+                            </p>
+                            <button class="btn-pirate w-full py-2 rounded font-semibold">
+                                Explore
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- Card 2 -->
+                    <article class="card-pirate rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
+                        <div class="bg-gradient-to-r from-amber-700 to-amber-900 h-40 flex items-center justify-center">
+                            <span class="text-5xl">💀</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-300 mb-3">Skull Island</h3>
+                            <p class="text-gray-300 mb-4">
+                                Discover the secrets hidden within the mysterious skull-shaped island, home to pirates of legend.
+                            </p>
+                            <button class="btn-pirate w-full py-2 rounded font-semibold">
+                                Discover
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- Card 3 -->
+                    <article class="card-pirate rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
+                        <div class="bg-gradient-to-r from-amber-700 to-amber-900 h-40 flex items-center justify-center">
+                            <span class="text-5xl">🗺️</span>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-300 mb-3">Treasure Maps</h3>
+                            <p class="text-gray-300 mb-4">
+                                Collect ancient maps and decode cryptic clues to locate buried treasure across the seven seas.
+                            </p>
+                            <button class="btn-pirate w-full py-2 rounded font-semibold">
+                                Collect
+                            </button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Treasures Section -->
+            <section id="treasures" class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-300 mb-12 text-center">
+                    Legendary Treasures
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="card-pirate p-6 rounded-lg text-center">
+                        <span class="text-4xl block mb-3">👑</span>
+                        <h3 class="text-amber-300 font-bold mb-2">Crown of Gold</h3>
+                        <p class="text-gray-400 text-sm">Worth 10,000 doubloons</p>
+                    </div>
+                    <div class="card-pirate p-6 rounded-lg text-center">
+                        <span class="text-4xl block mb-3">💎</span>
+                        <h3 class="text-amber-300 font-bold mb-2">Diamond Gem</h3>
+                        <p class="text-gray-400 text-sm">Worth 8,000 doubloons</p>
+                    </div>
+                    <div class="card-pirate p-6 rounded-lg text-center">
+                        <span class="text-4xl block mb-3">⚱️</span>
+                        <h3 class="text-amber-300 font-bold mb-2">Ancient Urn</h3>
+                        <p class="text-gray-400 text-sm">Worth 6,000 doubloons</p>
+                    </div>
+                    <div class="card-pirate p-6 rounded-lg text-center">
+                        <span class="text-4xl block mb-3">🗝️</span>
+                        <h3 class="text-amber-300 font-bold mb-2">Secret Key</h3>
+                        <p class="text-gray-400 text-sm">Worth 5,000 doubloons</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact/Sign-up Section -->
+            <section id="contact" class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-300 mb-12 text-center">
+                    Join the Crew
+                </h2>
+                <div class="max-w-md mx-auto card-pirate p-8 rounded-lg">
+                    <form @submit.prevent="handleFormSubmit" class="space-y-4">
+                        <div>
+                            <label for="pirate-name" class="block text-amber-300 font-bold mb-2">Your Pirate Name</label>
+                            <input
+                                type="text"
+                                id="pirate-name"
+                                x-model="formData.name"
+                                class="input-pirate w-full px-4 py-2 rounded border-2 border-amber-600 bg-gray-800 text-amber-100 focus:outline-none focus:border-amber-300 transition"
+                                placeholder="e.g., Captain Blackbeard"
+                                required
+                            >
+                        </div>
+                        <div>
+                            <label for="pirate-email" class="block text-amber-300 font-bold mb-2">Message from the Sea</label>
+                            <textarea
+                                id="pirate-email"
+                                x-model="formData.message"
+                                class="input-pirate w-full px-4 py-2 rounded border-2 border-amber-600 bg-gray-800 text-amber-100 focus:outline-none focus:border-amber-300 transition"
+                                placeholder="Share your pirate tale..."
+                                rows="5"
+                                required
+                            ></textarea>
+                        </div>
+                        <button
+                            type="submit"
+                            class="btn-pirate btn-treasure w-full py-3 rounded-lg font-bold uppercase tracking-wider"
+                        >
+                            Send Message
+                        </button>
+                    </form>
+                    <div x-show="formSubmitted" class="mt-4 p-4 bg-green-900 rounded border border-green-500">
+                        <p class="text-green-200 font-semibold">⚓ Message received! Welcome aboard!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="nav-pirate bg-gray-900 border-t-2 border-amber-700 py-8 px-4 text-center">
+            <div class="container mx-auto">
+                <p class="text-amber-200 mb-2">
+                    &copy; 2024 Pirate Quest Adventures. All rights reserved.
+                </p>
+                <p class="text-gray-400 text-sm">
+                    Sail the seas with honor and treasure! 🏴‍☠️
+                </p>
+                <div class="mt-4 space-x-4">
+                    <a href="#" class="text-amber-300 hover:text-amber-100 transition text-sm">Privacy Policy</a>
+                    <a href="#" class="text-amber-300 hover:text-amber-100 transition text-sm">Terms of Service</a>
+                    <a href="#" class="text-amber-300 hover:text-amber-100 transition text-sm">Contact Us</a>
+                </div>
+            </div>
+        </footer>
     </div>
-    
-    <script>
-        function appState() {
-            return {
-                scoreboardVisible: false,
-                rounds: [1, 2, 3, 4, 5],
-                players: [
-                    {
-                        name: 'Captain Jack',
-                        roundScores: [8, 7, 9, 6, 8],
-                        totalScore: 38
-                    },
-                    {
-                        name: 'Blackbeard',
-                        roundScores: [7, 8, 7, 8, 9],
-                        totalScore: 39
-                    },
-                    {
-                        name: 'Davy Jones',
-                        roundScores: [6, 6, 8, 7, 7],
-                        totalScore: 34
-                    },
-                    {
-                        name: 'Anne Bonny',
-                        roundScores: [9, 8, 8, 9, 8],
-                        totalScore: 42
-                    },
-                    {
-                        name: 'Long John',
-                        roundScores: [5, 7, 6, 8, 7],
-                        totalScore: 33
-                    }
-                ]
-            }
-        }
-    </script>
-    
-    <script src="js/scoreboardUI.js"></script>
-    <script src="js/trick-entry.js"></script>
-    <script src="app.js"></script>
 </body>
 </html>
