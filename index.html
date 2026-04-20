@@ -10,6 +10,8 @@
     <script defer src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="js/gameState.js"></script>
+    <script defer src="js/gameFlow.js"></script>
     <script defer src="script.js"></script>
     <script defer src="js/app.js"></script>
 </head>
@@ -319,6 +321,137 @@
 
         <!-- Main Content Area -->
         <main class="container mx-auto px-4 py-16">
+            <!-- Game Flow Section -->
+            <section id="game-flow" class="mb-16" x-data="gameFlow()">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-300 mb-8 text-center">
+                    ⚔️ Game Quest Progress
+                </h2>
+
+                <!-- Phase Progression Bar -->
+                <div class="mb-8 bg-gray-800 rounded-lg p-6 border-2 border-amber-700">
+                    <div class="mb-4">
+                        <p class="text-amber-300 font-bold mb-3">Quest Phase Progress</p>
+                        <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                            <div
+                                class="bg-gradient-to-r from-amber-600 to-amber-400 h-full transition-all duration-300 ease-out"
+                                :style="`width: ${(currentPhaseIndex + 1) / totalPhases * 100}%`"
+                            ></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>Phase <span x-text="currentPhaseIndex + 1"></span> of <span x-text="totalPhases"></span></span>
+                        <span x-text="currentPhaseName" class="text-amber-300 font-semibold"></span>
+                    </div>
+                </div>
+
+                <!-- Phase Indicators -->
+                <div class="mb-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <template x-for="(phase, index) in phases" :key="index">
+                            <div
+                                class="p-4 rounded-lg border-2 transition-all duration-200"
+                                :class="{
+                                    'bg-amber-700 border-amber-500 text-amber-100': index === currentPhaseIndex,
+                                    'bg-green-800 border-green-600 text-green-100': index < currentPhaseIndex,
+                                    'bg-gray-700 border-gray-600 text-gray-400': index > currentPhaseIndex
+                                }"
+                            >
+                                <div class="text-center">
+                                    <div class="text-2xl mb-1">
+                                        <span x-show="index < currentPhaseIndex">✓</span>
+                                        <span x-show="index === currentPhaseIndex">▶</span>
+                                        <span x-show="index > currentPhaseIndex">●</span>
+                                    </div>
+                                    <p class="text-sm font-bold" x-text="phase"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Round Counter -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="card-pirate bg-gray-800 border-2 border-amber-700 rounded-lg p-6 text-center">
+                        <p class="text-gray-400 text-sm mb-2">Current Round</p>
+                        <p class="text-4xl font-bold text-amber-300" x-text="currentRound"></p>
+                    </div>
+                    <div class="card-pirate bg-gray-800 border-2 border-amber-700 rounded-lg p-6 text-center">
+                        <p class="text-gray-400 text-sm mb-2">Total Rounds</p>
+                        <p class="text-4xl font-bold text-amber-300" x-text="totalRounds"></p>
+                    </div>
+                    <div class="card-pirate bg-gray-800 border-2 border-amber-700 rounded-lg p-6 text-center">
+                        <p class="text-gray-400 text-sm mb-2">Status</p>
+                        <p class="text-xl font-bold" :class="isGameActive ? 'text-green-400' : 'text-amber-300'" x-text="isGameActive ? 'In Progress' : 'Awaiting Start'"></p>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="flex flex-col md:flex-row gap-4 justify-center mb-8">
+                    <button
+                        @click="startGame()"
+                        x-show="!isGameActive"
+                        class="btn-pirate btn-treasure px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all hover:scale-105"
+                    >
+                        🚀 Start Quest
+                    </button>
+                    <button
+                        @click="nextPhase()"
+                        x-show="isGameActive && !isGameComplete"
+                        class="btn-pirate bg-amber-700 hover:bg-amber-600 px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all hover:scale-105"
+                    >
+                        ⚔️ Next Phase
+                    </button>
+                    <button
+                        @click="nextRound()"
+                        x-show="isGameActive && !isGameComplete"
+                        class="btn-pirate bg-green-700 hover:bg-green-600 px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all hover:scale-105"
+                    >
+                        ➜ Next Round
+                    </button>
+                    <button
+                        @click="resetGame()"
+                        x-show="isGameActive"
+                        class="btn-pirate bg-red-700 hover:bg-red-600 px-8 py-3 rounded-lg font-bold uppercase tracking-wider transition-all hover:scale-105"
+                    >
+                        🔄 Reset
+                    </button>
+                </div>
+
+                <!-- Game Status Info -->
+                <div class="bg-gray-800 rounded-lg p-6 border-l-4 border-amber-600 mb-8" x-show="isGameActive">
+                    <p class="text-amber-300 font-semibold mb-2">Current Quest Phase</p>
+                    <p class="text-gray-300 text-lg" x-text="currentPhaseName"></p>
+                </div>
+
+                <!-- Game Completion Modal -->
+                <div x-show="isGameComplete" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" @click.self="resetGame()">
+                    <div class="card-pirate bg-gray-800 rounded-lg shadow-2xl border-4 border-amber-600 max-w-md w-full p-8 text-center transform transition-all" x-show="isGameComplete">
+                        <div class="text-6xl mb-6">🏆</div>
+                        <h3 class="text-3xl font-bold text-amber-300 mb-4">Quest Complete!</h3>
+                        <p class="text-gray-300 mb-2 text-lg">You have successfully completed your pirate quest!</p>
+                        <div class="bg-gray-700 rounded-lg p-4 my-6 border-2 border-amber-600">
+                            <p class="text-amber-300 text-sm mb-1">Final Stats</p>
+                            <p class="text-2xl font-bold text-amber-400 mb-2" x-text="`Rounds Completed: ${currentRound}`"></p>
+                            <p class="text-gray-400 text-sm" x-text="`Phases Conquered: ${totalPhases}`"></p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button
+                                @click="resetGame()"
+                                class="btn-pirate btn-treasure flex-1 py-3 rounded-lg font-bold uppercase tracking-wider transition-all hover:scale-105"
+                            >
+                                🚀 New Quest
+                            </button>
+                            <button
+                                @click="closeCompletionModal()"
+                                class="btn-pirate bg-gray-700 hover:bg-gray-600 flex-1 py-3 rounded-lg font-bold uppercase tracking-wider transition-all hover:scale-105"
+                            >
+                                📖 Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Adventures Section -->
             <section id="adventures" class="mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-amber-300 mb-12 text-center">
